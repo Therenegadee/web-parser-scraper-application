@@ -1,0 +1,330 @@
+openapi: 3.0.0
+info:
+  title: Data Harvest Parser
+  version: 0.0.1
+servers:
+  - url: http://localhost:8082/api
+    description: Development Server
+
+paths:
+  /parser/settings:
+    post:
+      security:
+        - bearerAuth: [ ]
+      summary: Set Settings for Parsing
+      tags:
+        - Parser
+      operationId: setParserSettings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserParserSettingsOpenApi"
+      responses:
+        '201':
+          description: Settings were Successfully Set
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /parser/history:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Return List of User Parser Queries History
+      tags:
+        - Parser
+      operationId: getAllParserQueries
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ParserResultOpenApi'
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /parser/{id}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Return Parser Settings and It's Result File
+      tags:
+        - Parser
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          description: Parser Settings ID
+      operationId: showParserResultsById
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParserResultOpenApi"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+    post:
+      security:
+        - bearerAuth: [ ]
+      summary: Start Parsing with Preset Settings with {id}
+      tags:
+        - Parser
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          description: Parser Settings ID
+      operationId: runParser
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: This Parser Settings wasn't found
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /parser/{id}/download:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Download Results File With the Specific ID
+      tags:
+        - Parser
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          description: Parser Results File ID
+      operationId: downloadFile
+      responses:
+        200:
+          description: The file download was successful
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        500:
+          description: Internal Server Error
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+
+  schemas:
+
+    UserOpenApi:
+      type: object
+      required:
+        - username
+        - email
+        - userStatus
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        email:
+          type: string
+        roles:
+          type: array
+          items:
+            type: object
+            $ref: "#/components/schemas/RoleOpenApi"
+        userStatus:
+          type: object
+          $ref: "#/components/schemas/UserStatusOpenApi"
+        userParseSettingsIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        parserResultsIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        telegramUserId:
+          type: string
+
+    RoleOpenApi:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: object
+          $ref: "#/components/schemas/ERoleOpenApi"
+
+
+    ERoleOpenApi:
+      type: string
+      enum:
+        - ROLE_USER
+        - ROLE_ADMIN
+
+    UserStatusOpenApi:
+      type: string
+      enum:
+        - CONFIRMED_ACCOUNT
+        - WAIT_FOR_EMAIL_VERIFICATION
+
+    LoginRequestOpenApi:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    SignupRequestOpenApi:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+
+    JwtResponseOpenApi:
+      type: object
+      required:
+        - id
+        - accessToken
+        - username
+      properties:
+        id:
+          type: integer
+          format: int64
+        accessToken:
+          type: string
+          pattern: ^Bearer\s.+$
+        username:
+          type: string
+
+    ParserResultOpenApi:
+      type: object
+      required:
+        - id
+        - userParserSettingsId
+        - linkToDownloadResults
+      properties:
+        id:
+          type: integer
+          format: int64
+        userParserSettingsId:
+          type: integer
+          format: int64
+        linkToDownloadResults:
+          type: string
+
+    UserParserSettingsOpenApi:
+      type: object
+      required:
+        - firstPageUrl
+        - numOfPagesToParse
+        - className
+        - tagName
+        - cssSelectorNextPage
+        - header
+        - elementLocatorsIds
+        - outputFileType
+      properties:
+        firstPageUrl:
+          type: string
+        numOfPagesToParse:
+          type: integer
+          format: int32
+        className:
+          type: string
+        tagName:
+          type: string
+        cssSelectorNextPage:
+          type: string
+        header:
+          type: array
+          items:
+            type: string
+        elementLocatorsIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        outputFileType:
+          type: object
+          $ref: "#/components/schemas/OutputFileTypeOpenApi"
+
+
+    ElementLocatorOpenApi:
+      type: object
+      required:
+        - elementType
+        - pathToLocator
+        - userParserSettingsId
+      properties:
+        id:
+          type: integer
+          format: int64
+        elementType:
+          type: object
+          $ref: "#/components/schemas/ElementTypeOpenApi"
+        pathToLocator:
+          type: string
+        extraPointer:
+          type: string
+        userParserSettingsId:
+          type: integer
+          format: int64
+
+    OutputFileTypeOpenApi:
+      type: string
+      enum:
+        - XLSX
+        - CSV
+
+    ElementTypeOpenApi:
+      type: string
+      enum:
+        - XPATH
+        - TAG_ATTR
+        - CSS
