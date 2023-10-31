@@ -16,7 +16,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/parser")
 @RequiredArgsConstructor
-@Log4j
 public class ParserController implements ParserApiDelegate {
     private final ParserService parserService;
 

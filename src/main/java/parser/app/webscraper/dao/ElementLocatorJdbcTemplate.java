@@ -20,7 +20,6 @@ import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
-@Log4j
 public class ElementLocatorJdbcTemplate implements ElementLocatorDao {
     private final JdbcTemplate jdbcTemplate;
     private final ElementLocatorRowMapper elementMapper;

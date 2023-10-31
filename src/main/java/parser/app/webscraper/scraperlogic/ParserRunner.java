@@ -27,7 +27,6 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Log4j
 public class ParserRunner {
     @Autowired
     private final ParserConfiguration configuration;

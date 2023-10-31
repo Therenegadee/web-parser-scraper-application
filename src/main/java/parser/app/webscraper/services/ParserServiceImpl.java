@@ -24,7 +24,6 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-@Log4j
 public class ParserServiceImpl implements ParserService {
     private final ParserRunner parserRunner;
     private final UserParserSettingsMapper parserSettingsMapper;

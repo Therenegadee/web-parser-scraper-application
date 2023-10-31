@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS element_locator (
 CREATE TABLE IF NOT EXISTS parser_results (
     id BIGSERIAL PRIMARY KEY,
     user_parser_settings_id BIGINT REFERENCES user_parser_settings (id),
-    user_id BIGINT REFERENCES users (id),
+    user_id BIGINT,
     link_to_download VARCHAR
 );
 
