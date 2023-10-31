@@ -3,7 +3,6 @@ package parser.app.webscraper.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +13,8 @@ import parser.userService.openapi.model.UserParserSettingsOpenApi;
 
 import java.util.List;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/parser")
-@FeignClient("parser-service")
 @RequiredArgsConstructor
 @Log4j
 public class ParserController implements ParserApiDelegate {
