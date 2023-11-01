@@ -2,6 +2,7 @@ package parser.app.webscraper.services;
 
 
 
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.core.io.Resource;
@@ -22,6 +23,7 @@ import parser.userService.openapi.model.UserParserSettingsOpenApi;
 import java.util.Optional;
 import java.util.Set;
 
+@Observed
 @Service
 @RequiredArgsConstructor
 public class ParserServiceImpl implements ParserService {

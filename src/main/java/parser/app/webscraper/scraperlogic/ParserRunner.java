@@ -1,5 +1,6 @@
 package parser.app.webscraper.scraperlogic;
 
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.By;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+@Observed
 @Service
 @RequiredArgsConstructor
 public class ParserRunner {

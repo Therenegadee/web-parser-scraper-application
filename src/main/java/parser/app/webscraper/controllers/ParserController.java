@@ -1,5 +1,6 @@
 package parser.app.webscraper.controllers;
 
+import io.micrometer.observation.annotation.Observed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
@@ -13,6 +14,7 @@ import parser.userService.openapi.model.UserParserSettingsOpenApi;
 
 import java.util.List;
 
+@Observed
 @RestController
 @RequestMapping("/api/parser")
 @RequiredArgsConstructor

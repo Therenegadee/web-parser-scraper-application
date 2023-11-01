@@ -1,10 +1,12 @@
 package parser.app.webscraper.dao;
 
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import parser.app.webscraper.dao.interfaces.ParserResultDao;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.mappers.jdbc.ParserResultRowMapper;
@@ -14,12 +16,14 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.*;
 
+@Observed
 @Repository
 @RequiredArgsConstructor
 public class ParserResultJdbcTemplate implements ParserResultDao {
     private final JdbcTemplate jdbcTemplate;
     private final ParserResultRowMapper parserResultMapper;
 
+    @Transactional
     @Override
     public Optional<ParserResult> findById(Long id) {
         String query = "SELECT * FROM parser_results WHERE id=?";
@@ -29,6 +33,7 @@ public class ParserResultJdbcTemplate implements ParserResultDao {
                 .findAny();
     }
 
+    @Transactional
     @Override
     public Optional<ParserResult> findByParserSettingsId(Long id) {
         String query = "SELECT * FROM parser_results WHERE user_parser_settings_id=?";
@@ -38,6 +43,7 @@ public class ParserResultJdbcTemplate implements ParserResultDao {
                 .findAny();
     }
 
+    @Transactional
     @Override
     public ParserResult save(ParserResult parserResult) {
         if (Objects.isNull(parserResult)) throw new IllegalArgumentException("Parser Result is Null!");
@@ -58,6 +64,7 @@ public class ParserResultJdbcTemplate implements ParserResultDao {
                 .orElseThrow(() -> new RuntimeException("Parser Result doesn't exist"));
     }
 
+    @Transactional
     @Override
     public ParserResult update(ParserResult parserResult) {
         if (Objects.isNull(parserResult)) throw new IllegalArgumentException("Parse rResult is Null!");
@@ -65,6 +72,7 @@ public class ParserResultJdbcTemplate implements ParserResultDao {
         return updateById(id, parserResult);
     }
 
+    @Transactional
     @Override
     public ParserResult updateById(Long id, ParserResult parserResult) {
         if (Objects.isNull(parserResult)) throw new IllegalArgumentException("Parser Result is Null!");
@@ -82,12 +90,14 @@ public class ParserResultJdbcTemplate implements ParserResultDao {
         }
     }
 
+    @Transactional
     @Override
     public Set<ParserResult> findAll() {
         String query = "SELECT * FROM parser_results";
         return new HashSet<>(jdbcTemplate.query(query, parserResultMapper));
     }
 
+    @Transactional
     @Override
     public Set<ParserResult> findAllByUserId(Long id) {
         if (Objects.nonNull(id)) {
@@ -98,6 +108,7 @@ public class ParserResultJdbcTemplate implements ParserResultDao {
         }
     }
 
+    @Transactional
     @Override
     public Set<ParserResult> findAllByIds(List<Long> ids) {
         if (Objects.nonNull(ids) && !ids.isEmpty()) {
@@ -108,6 +119,7 @@ public class ParserResultJdbcTemplate implements ParserResultDao {
         }
     }
 
+    @Transactional
     @Override
     public int deleteById(Long id) {
         if (Objects.nonNull(id) && findById(id).isPresent()) {
@@ -118,6 +130,7 @@ public class ParserResultJdbcTemplate implements ParserResultDao {
         }
     }
 
+    @Transactional
     @Override
     public int delete(ParserResult parserResult) {
         if (Objects.isNull(parserResult)) throw new IllegalArgumentException("ParserResult is Null!");
@@ -125,6 +138,7 @@ public class ParserResultJdbcTemplate implements ParserResultDao {
         return deleteById(id);
     }
 
+    @Transactional
     @Override
     public int deleteAll() {
         String query = "DELETE FROM parser_results";

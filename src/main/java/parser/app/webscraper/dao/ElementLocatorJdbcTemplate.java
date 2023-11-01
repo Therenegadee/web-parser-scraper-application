@@ -1,11 +1,13 @@
 package parser.app.webscraper.dao;
 
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import parser.app.webscraper.dao.interfaces.ElementLocatorDao;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.mappers.jdbc.ElementLocatorRowMapper;
@@ -18,12 +20,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+@Observed
 @Repository
 @RequiredArgsConstructor
 public class ElementLocatorJdbcTemplate implements ElementLocatorDao {
     private final JdbcTemplate jdbcTemplate;
     private final ElementLocatorRowMapper elementMapper;
 
+    @Transactional
     @Override
     public Optional<ElementLocator> findById(Long id) {
         String query = "SELECT * FROM element_locator WHERE id=?";
@@ -33,6 +37,7 @@ public class ElementLocatorJdbcTemplate implements ElementLocatorDao {
                 .findFirst();
     }
 
+    @Transactional
     @Override
     public ElementLocator save(ElementLocator elementLocator) {
         if (Objects.isNull(elementLocator)) throw new IllegalArgumentException("ElementLocator is Null!");
@@ -55,6 +60,7 @@ public class ElementLocatorJdbcTemplate implements ElementLocatorDao {
                 .orElseThrow(() -> new RuntimeException("Element Locator doesn't exist"));
     }
 
+    @Transactional
     @Override
     public ElementLocator update(ElementLocator elementLocator) {
         if (Objects.isNull(elementLocator)) throw new IllegalArgumentException("ElementLocator is Null!");
@@ -62,6 +68,7 @@ public class ElementLocatorJdbcTemplate implements ElementLocatorDao {
         return updateById(id, elementLocator);
     }
 
+    @Transactional
     @Override
     public ElementLocator updateById(Long id, ElementLocator elementLocator) {
         if (Objects.isNull(elementLocator)) throw new IllegalArgumentException("ElementLocator is Null!");
@@ -79,12 +86,14 @@ public class ElementLocatorJdbcTemplate implements ElementLocatorDao {
         }
     }
 
+    @Transactional
     @Override
     public Set<ElementLocator> findAll() {
         String query = "SELECT * FROM element_locator";
         return new HashSet<>(jdbcTemplate.query(query, elementMapper));
     }
 
+    @Transactional
     @Override
     public Set<ElementLocator> findAllByParserSettingsId(Long id) {
         String query = "SELECT * FROM element_locator WHERE user_parser_settings_id=?";
@@ -92,6 +101,7 @@ public class ElementLocatorJdbcTemplate implements ElementLocatorDao {
     }
 
 
+    @Transactional
     @Override
     public int delete(ElementLocator elementLocator) {
         if (Objects.isNull(elementLocator)) throw new IllegalArgumentException("ElementLocator is Null!");
@@ -99,6 +109,7 @@ public class ElementLocatorJdbcTemplate implements ElementLocatorDao {
         return deleteById(id);
     }
 
+    @Transactional
     @Override
     public int deleteById(Long id) {
         if (Objects.nonNull(id) && findById(id).isPresent()) {
@@ -109,6 +120,7 @@ public class ElementLocatorJdbcTemplate implements ElementLocatorDao {
         }
     }
 
+    @Transactional
     @Override
     public int deleteAll() {
         String query = "DELETE FROM element_locator";
