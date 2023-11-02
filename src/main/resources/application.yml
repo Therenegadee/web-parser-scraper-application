@@ -5,13 +5,15 @@ server:
     include-binding-errors: always
 
 spring:
-  sql:
-    init:
-      mode: always
+  application:
+    name: scrapper-service
+#  sql:
+#    init:
+#      mode: always
   datasource:
-    username: scraperService
-    password: scraperService
-    url: jdbc:postgresql://localhost:5433/scraper_service
+    username: scrapper_service
+    password: scrapper_service
+    url: jdbc:postgresql://db-parser:5432/scrapper_service
 
 webdriver:
   http:
@@ -39,10 +41,16 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus,metrics
+        include: health,info,prometheus,metrics,beans
   metrics:
+    export:
+      loki:
+        enabled: true
+        step: 1m
     tags:
       application: ${spring.application.name}
+    prometheus:
+      enabled: true
     distribution:
       percentiles-histogram:
         http:

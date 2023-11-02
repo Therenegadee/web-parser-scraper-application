@@ -14,7 +14,6 @@ import parser.userService.openapi.model.UserParserSettingsOpenApi;
 
 import java.util.List;
 
-@Observed
 @RestController
 @RequestMapping("/api/parser")
 @RequiredArgsConstructor
@@ -22,6 +21,7 @@ public class ParserController implements ParserApiDelegate {
     private final ParserService parserService;
 
     @Override
+    @Observed
     public ResponseEntity<List<ParserResultOpenApi>> getAllParserQueries() {
         return ResponseEntity
                 .ok(parserService.getAllParserQueries().stream().toList());
@@ -29,6 +29,7 @@ public class ParserController implements ParserApiDelegate {
     }
 
     @Override
+    @Observed
     @GetMapping("/{id}")
 //    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ParserResultOpenApi> showParserResultsById(@PathVariable("id") @Valid Long id) {
@@ -36,6 +37,7 @@ public class ParserController implements ParserApiDelegate {
     }
 
     @Override
+    @Observed
     @PostMapping("/settings")
 //    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Void> setParserSettings(@RequestBody UserParserSettingsOpenApi userParserSettingsOpenApi) {
@@ -43,6 +45,7 @@ public class ParserController implements ParserApiDelegate {
     }
 
     @Override
+    @Observed
     @PostMapping("/{id}")
 //    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Void> runParser(@PathVariable("id") @Valid Long id) {
@@ -50,6 +53,7 @@ public class ParserController implements ParserApiDelegate {
     }
 
     @Override
+    @Observed
     @GetMapping("/{id}/download")
 //    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Resource> downloadFile(@PathVariable("id") @Valid Long id) {

@@ -33,3 +33,4 @@ build/
 ### VS Code ###
 .vscode/
 !/src/main/resources/application.yml
+/jar/parser-service-1.0.jar

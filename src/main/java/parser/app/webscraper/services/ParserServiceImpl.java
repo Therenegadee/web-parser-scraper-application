@@ -34,11 +34,13 @@ public class ParserServiceImpl implements ParserService {
     private final ParserResultDao parserResultDao;
 
     @Override
+    @Observed
     public Set<ParserResultOpenApi> getAllParserQueries() {
         return parserResultMapper.toOpenApi(parserResultDao.findAll());
     }
 
     @Override
+    @Observed
     public ParserResultOpenApi showParserResultsById(Long id) {
         Optional<ParserResult> parserResultOpt = parserResultDao.findById(id);
         if (parserResultOpt.isPresent()) {
@@ -50,6 +52,7 @@ public class ParserServiceImpl implements ParserService {
     }
 
     @Override
+    @Observed
     public ResponseEntity<Void> setParserSettings(UserParserSettingsOpenApi userParserSettingsOpenApi) {
         UserParserSetting userParserSettings = parserSettingsMapper.toUserParseSetting(userParserSettingsOpenApi);
         parseSettingRepository.save(userParserSettings);
@@ -59,6 +62,7 @@ public class ParserServiceImpl implements ParserService {
     }
 
     @Override
+    @Observed
     public ResponseEntity<Void> runParser(Long id) {
         Optional<UserParserSetting> userParserSettingOpt = parseSettingRepository.findById(id);
         UserParserSetting userParserSetting;
@@ -94,6 +98,7 @@ public class ParserServiceImpl implements ParserService {
     }
 
     @Override
+    @Observed
     public ResponseEntity<Resource> downloadFile(Long id) {
         return null;
     }

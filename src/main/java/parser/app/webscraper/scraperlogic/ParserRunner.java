@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-@Observed
 @Service
 @RequiredArgsConstructor
 public class ParserRunner {
@@ -38,6 +37,7 @@ public class ParserRunner {
     private final List<ParseElement> parsingTypes = new ArrayList<>();
     private final HashMap<String, List<String>> allPagesParseResult = new HashMap<>();
 
+    @Observed
     public String runParser(UserParserSetting userParserSetting, String username) {
         driver = new ChromeDriver(chromeOptions);
         String firstPageURL = userParserSetting.getFirstPageUrl(); // https://zhongchou.modian.com/all/top_comment/all/1
@@ -82,10 +82,12 @@ public class ParserRunner {
         return outPutFilePath;
     }
 
+    @Observed
     public void clickNextPageButton (String cssSelectorNextPage) {
         WebElement nextPageButton = driver.findElement(By.cssSelector(cssSelectorNextPage)); // "body > div > div.pro_field > div > div > a.next"
         nextPageButton.click();
     }
+    @Observed
     public List<String> getPagesToParseLinks(WebDriver driver, UserParserSetting userParserSetting) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10L));
         int numOfPagesToParse = userParserSetting.getNumOfPagesToParse();
