@@ -22,7 +22,7 @@ public class ParserResultRowMapper implements RowMapper<ParserResult> {
         return ParserResult
                 .builder()
                 .id(rs.getLong("id"))
-                .userParserSettings(getParserSettingsById(rs.getLong("user_parser_settings_id")))
+                .userParserSetting(getParserSettingsById(rs.getLong("user_parser_settings_id")))
                 .linkToDownloadResults(rs.getString("link_to_download"))
                 .build();
     }

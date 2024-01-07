@@ -21,6 +21,7 @@ import parser.app.webscraper.scraperlogic.logic.element.XPathElement;
 })
 public class ElementLocator {
     private Long id;
+    private String name;
     private ElementType type;
     private String pathToLocator;
     private String extraPointer; // for Tag + Attribute

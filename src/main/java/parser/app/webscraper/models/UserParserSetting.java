@@ -2,8 +2,8 @@ package parser.app.webscraper.models;
 
 
 import lombok.*;
-import parser.app.webscraper.scraperlogic.logic.outputFile.OutputFileType;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Getter
@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserParserSetting {
+public class UserParserSetting extends FolderItem {
     private Long id;
     private String firstPageUrl;
     private int numOfPagesToParse;
@@ -20,5 +20,5 @@ public class UserParserSetting {
     private String cssSelectorNextPage; // CSS Selector кнопки переключения страниц
     private List<String> header;
     private List<ElementLocator> elementLocators;
-    private OutputFileType outputFileType;
+    private HashSet<ParserResult> parsingHistory;
 }
