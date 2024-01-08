@@ -2,7 +2,6 @@ package parser.app.webscraper.scraperlogic;
 
 import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -14,8 +13,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parser.app.webscraper.config.ParserConfiguration;
+import parser.app.webscraper.dto.ParsingPreset;
 import parser.app.webscraper.models.ElementLocator;
-import parser.app.webscraper.models.UserParserSetting;
 import parser.app.webscraper.scraperlogic.logic.element.ParseElement;
 import parser.app.webscraper.scraperlogic.logic.outputFile.OutputFile;
 import parser.app.webscraper.scraperlogic.logic.outputFile.OutputFileType;
@@ -38,16 +37,16 @@ public class ParserRunner {
     private final HashMap<String, List<String>> allPagesParseResult = new HashMap<>();
 
     @Observed
-    public String runParser(UserParserSetting userParserSetting, String username) {
+    public String runParser(ParsingPreset parsingPreset) {
         driver = new ChromeDriver(chromeOptions);
-        String firstPageURL = userParserSetting.getFirstPageUrl(); // https://zhongchou.modian.com/all/top_comment/all/1
+        String firstPageURL = parsingPreset.getFirstPageUrl(); // https://zhongchou.modian.com/all/top_comment/all/1
         driver.get(firstPageURL);
 
-        for (ElementLocator e : userParserSetting.getElementLocators()) {
+        for (ElementLocator e : parsingPreset.getElementLocators()) {
             parsingTypes.add(configuration.parseElement(e, driver));
         }
 
-        List<String> linksToPagesForParse = getPagesToParseLinks(driver, userParserSetting);
+        List<String> linksToPagesForParse = getPagesToParseLinks(driver, parsingPreset);
 
         int parsePageNumber = 1;
         for (String link : linksToPagesForParse) {
@@ -64,7 +63,7 @@ public class ParserRunner {
         System.out.println("Парсинг закончен.");
         driver.quit();
 
-        OutputFileType fileType = userParserSetting.getOutputFileType();
+        OutputFileType fileType = parsingPreset.getOutputFileType();
         StringBuilder fileNameBuilder = new StringBuilder(UUID.randomUUID().toString());
         fileNameBuilder.append("file");
 
@@ -72,11 +71,11 @@ public class ParserRunner {
             fileNameBuilder.append(".csv");
         }
 
-        List<String> header = userParserSetting.getHeader();
+        List<String> header = parsingPreset.getHeader();
         header.add(0, "URL");
 
         String fileName = fileNameBuilder.toString();
-        String outPutFilePath = "src/main/resources/savedFilesDirectory/" + username + "/" +fileName;
+        String outPutFilePath = "src/main/resources/savedFilesDirectory/" + parsingPreset.getUsername() + "/" +fileName;
         OutputFile outputFile = new OutputFile(fileType);
         outputFile.exportData(header, allPagesParseResult, outPutFilePath);
         return outPutFilePath;
@@ -88,12 +87,12 @@ public class ParserRunner {
         nextPageButton.click();
     }
     @Observed
-    public List<String> getPagesToParseLinks(WebDriver driver, UserParserSetting userParserSetting) {
+    public List<String> getPagesToParseLinks(WebDriver driver, ParsingPreset parsingPreset) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10L));
-        int numOfPagesToParse = userParserSetting.getNumOfPagesToParse();
+        int numOfPagesToParse = parsingPreset.getNumOfPagesToParse();
         List<String> linksToPagesForParse = new ArrayList<>();
-        String className = userParserSetting.getClassName(); // pc_ga_pro_index_17
-        String tagName = userParserSetting.getTagName(); // a
+        String className = parsingPreset.getClassName(); // pc_ga_pro_index_17
+        String tagName = parsingPreset.getTagName(); // a
         if (numOfPagesToParse <= 0) {
             System.err.println("Неверный ввод. Введите число в диапазоне от 1 до n");
         } else if (numOfPagesToParse == 1) {
@@ -112,7 +111,7 @@ public class ParserRunner {
             }
         } else if (numOfPagesToParse > 1) {
             System.out.println("Введите CSS Selector путь кнопки переключения следующей страницы: ");
-            String cssSelectorNextPage = userParserSetting.getCssSelectorNextPage(); // body > div > div.pro_field > div > div > a.next
+            String cssSelectorNextPage = parsingPreset.getCssSelectorNextPage(); // body > div > div.pro_field > div > div > a.next
             for (int i = 1; i <= numOfPagesToParse; i++) {
                 System.out.printf("Собираем ссылки со страницы %d...", i);
                 System.out.println();

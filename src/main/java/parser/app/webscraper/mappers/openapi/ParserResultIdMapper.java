@@ -18,7 +18,7 @@ public class ParserResultIdMapper {
                 .orElseThrow(() -> new NotFoundException(String.format("Parser Result with id %d wasn't found", id)));
     }
 
-    public Set<ParserResult> getParserResultByIdS(List<Long> ids){
+    public List<ParserResult> getParserResultByIdS(List<Long> ids){
         return parserResultDao.findAllByIds(ids);
     }
 

@@ -20,6 +20,7 @@ import parser.app.webscraper.services.interfaces.ParserService;
 import parser.userService.openapi.model.ParserResultOpenApi;
 import parser.userService.openapi.model.UserParserSettingsOpenApi;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -35,7 +36,7 @@ public class ParserServiceImpl implements ParserService {
 
     @Override
     @Observed
-    public Set<ParserResultOpenApi> getAllParserQueries() {
+    public List<ParserResultOpenApi> getAllParserQueries() {
         return parserResultMapper.toOpenApi(parserResultDao.findAll());
     }
 

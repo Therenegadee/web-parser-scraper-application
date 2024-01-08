@@ -20,5 +20,6 @@ public class UserParserSetting extends FolderItem {
     private String cssSelectorNextPage; // CSS Selector кнопки переключения страниц
     private List<String> header;
     private List<ElementLocator> elementLocators;
-    private HashSet<ParserResult> parsingHistory;
+    private List<ParserResult> parsingHistory;
+    private Folder parentFolder;
 }

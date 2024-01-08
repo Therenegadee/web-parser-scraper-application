@@ -7,6 +7,7 @@ import parser.app.webscraper.dao.interfaces.UserParserSettingsDao;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.models.ParserResult;
 import parser.app.webscraper.models.UserParserSetting;
+import parser.app.webscraper.scraperlogic.logic.outputFile.OutputFileType;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,8 +23,10 @@ public class ParserResultRowMapper implements RowMapper<ParserResult> {
         return ParserResult
                 .builder()
                 .id(rs.getLong("id"))
-                .userParserSetting(getParserSettingsById(rs.getLong("user_parser_settings_id")))
+                .date(rs.getDate("date"))
                 .linkToDownloadResults(rs.getString("link_to_download"))
+                .outputFileType(OutputFileType.fromValue(rs.getString("output_file_type")))
+                .userParserSetting(getParserSettingsById(rs.getLong("user_parser_settings_id")))
                 .build();
     }
 

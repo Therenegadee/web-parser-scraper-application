@@ -12,6 +12,7 @@ import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.mappers.jdbc.ParserResultRowMapper;
 import parser.app.webscraper.models.ParserResult;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.*;
@@ -35,28 +36,28 @@ public class ParserResultJdbcTemplate implements ParserResultDao {
 
     @Transactional
     @Override
-    public Optional<ParserResult> findByParserSettingsId(Long id) {
+    public List<ParserResult> findAllByParserSettingsId(Long id) {
         String query = "SELECT * FROM parser_results WHERE user_parser_settings_id=?";
-        return jdbcTemplate
-                .query(query, parserResultMapper, id)
-                .stream()
-                .findAny();
+        return new ArrayList<>(jdbcTemplate.query(query, parserResultMapper, id));
     }
 
     @Transactional
     @Override
     public ParserResult save(ParserResult parserResult) {
         if (Objects.isNull(parserResult)) throw new IllegalArgumentException("Parser Result is Null!");
-        String query = "INSERT INTO parser_results (user_parser_settings_id,link_to_download)" +
-                " VALUES(?,?) RETURNING id";
+        String query = "INSERT INTO parser_results " +
+                "(date,link_to_download,output_file_type,user_parser_settings_id) " +
+                "VALUES(?,?,?,?) RETURNING id";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             int index = 1;
-            ps.setLong(index++, parserResult.getUserParserSettings().getId());
+            ps.setDate(index++, new Date(parserResult.getDate().getTime()));
             ps.setString(index++, parserResult.getLinkToDownloadResults());
+            ps.setString(index++, parserResult.getOutputFileType().getValue());
+            ps.setLong(index++, parserResult.getUserParserSetting().getId());
             return ps;
         }, keyHolder);
 
@@ -67,7 +68,7 @@ public class ParserResultJdbcTemplate implements ParserResultDao {
     @Transactional
     @Override
     public ParserResult update(ParserResult parserResult) {
-        if (Objects.isNull(parserResult)) throw new IllegalArgumentException("Parse rResult is Null!");
+        if (Objects.isNull(parserResult)) throw new IllegalArgumentException("Parse Result is Null!");
         Long id = parserResult.getId();
         return updateById(id, parserResult);
     }
@@ -77,10 +78,11 @@ public class ParserResultJdbcTemplate implements ParserResultDao {
     public ParserResult updateById(Long id, ParserResult parserResult) {
         if (Objects.isNull(parserResult)) throw new IllegalArgumentException("Parser Result is Null!");
         if (Objects.nonNull(id) && findById(id).isPresent()) {
-            String query = "UPDATE parser_results SET user_parser_settings_id=?,link_to_download=?" +
-                    " WHERE id=?";
-            int rows = jdbcTemplate.update(query, parserResult.getUserParserSettings().getId(),
-                    parserResult.getLinkToDownloadResults(), id);
+            String query = "UPDATE parser_results SET date=?,link_to_download=?," +
+                    "output_file_type=?,user_parser_settings_id=? WHERE id=?";
+            int rows = jdbcTemplate.update(query, parserResult.getDate(),
+                    parserResult.getLinkToDownloadResults(), parserResult.getOutputFileType(),
+                    parserResult.getUserParserSetting().getId(), id);
             if (rows != 1) {
                 throw new RuntimeException("Invalid request in SQL: " + query);
             }
@@ -90,19 +92,24 @@ public class ParserResultJdbcTemplate implements ParserResultDao {
         }
     }
 
-    @Transactional
     @Override
-    public Set<ParserResult> findAll() {
-        String query = "SELECT * FROM parser_results";
-        return new HashSet<>(jdbcTemplate.query(query, parserResultMapper));
+    public void updateAll(List<ParserResult> parsingHistory) {
+        parsingHistory.forEach(this::update);
     }
 
     @Transactional
     @Override
-    public Set<ParserResult> findAllByUserId(Long id) {
+    public List<ParserResult> findAll() {
+        String query = "SELECT * FROM parser_results";
+        return new ArrayList<>(jdbcTemplate.query(query, parserResultMapper));
+    }
+
+    @Transactional
+    @Override
+    public List<ParserResult> findAllByUserId(Long id) {
         if (Objects.nonNull(id)) {
             String query = "SELECT * FROM parser_results WHERE user_id=?";
-            return new HashSet<>(jdbcTemplate.query(query, parserResultMapper, id));
+            return new ArrayList<>(jdbcTemplate.query(query, parserResultMapper, id));
         } else {
             throw new IllegalStateException("The id is null!");
         }
@@ -110,10 +117,10 @@ public class ParserResultJdbcTemplate implements ParserResultDao {
 
     @Transactional
     @Override
-    public Set<ParserResult> findAllByIds(List<Long> ids) {
+    public List<ParserResult> findAllByIds(List<Long> ids) {
         if (Objects.nonNull(ids) && !ids.isEmpty()) {
             String query = "SELECT * FROM parser_results WHERE id IN (?)";
-            return new HashSet<>(jdbcTemplate.query(query, parserResultMapper, ids));
+            return new ArrayList<>(jdbcTemplate.query(query, parserResultMapper, ids));
         } else {
             throw new IllegalStateException("The ids are null!");
         }

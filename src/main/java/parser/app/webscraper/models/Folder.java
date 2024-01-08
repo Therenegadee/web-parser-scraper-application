@@ -2,16 +2,17 @@ package parser.app.webscraper.models;
 
 import lombok.*;
 
-import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Folder {
+public class Folder extends FolderItem {
     private Long id;
     private Long userId;
-    private Folder parentFolder;
-    private HashSet<UserParserSetting> folderItems;
+    private Optional<Folder> parentFolder;
+    private List<FolderItem> folderItems;
 }

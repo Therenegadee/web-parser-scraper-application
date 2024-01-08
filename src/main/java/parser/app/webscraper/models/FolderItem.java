@@ -2,7 +2,7 @@ package parser.app.webscraper.models;
 
 import lombok.*;
 
-import java.util.HashSet;
+import java.util.List;
 
 @Getter
 @Setter
@@ -10,5 +10,5 @@ import java.util.HashSet;
 @NoArgsConstructor
 public class FolderItem {
     private String name;
-    private HashSet<String> tags;
+    private List<String> tags;
 }

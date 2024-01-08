@@ -1,12 +1,23 @@
 package parser.app.webscraper.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.stereotype.Component;
 import parser.app.webscraper.models.ElementLocator;
 import parser.app.webscraper.scraperlogic.logic.outputFile.OutputFileType;
 
 import java.util.Date;
 import java.util.List;
 
-public class ParsingPresetDTO {
+@Component
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class ParsingPreset {
+    private String username;
     private String firstPageUrl;
     private int numOfPagesToParse;
     private String className;

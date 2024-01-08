@@ -5,22 +5,21 @@ import parser.app.webscraper.models.ParserResult;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 public interface ParserResultDao {
     Optional<ParserResult> findById(Long id);
-    Optional<ParserResult> findByParserSettingsId(Long id);
+    List<ParserResult> findAllByParserSettingsId(Long id);
+    List<ParserResult> findAll();
+    List<ParserResult> findAllByUserId(Long id);
+    List<ParserResult> findAllByIds(List<Long> ids);
     ParserResult save(ParserResult parserResult);
 
     ParserResult update(ParserResult parserResult);
 
     ParserResult updateById(Long id, ParserResult parserResult);
 
-    Set<ParserResult> findAll();
-
-    Set<ParserResult> findAllByUserId(Long id);
-    Set<ParserResult> findAllByIds(List<Long> ids);
+    void updateAll(List<ParserResult> parsingHistory);
 
     int deleteById(Long id);
 
