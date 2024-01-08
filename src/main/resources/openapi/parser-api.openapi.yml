@@ -127,6 +127,36 @@ paths:
         500:
           description: Internal Server Error
 
+  /folder:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Folder
+      summary: Retrieving All Folder Items of User with Concrete Id
+      parameters:
+        - name: userId
+          in: query
+          description: User id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      operationId: getAllFolderItemsByUserId
+      responses:
+        200:
+          description: The folder items were retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FolderItemOpenApi"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        500:
+          description: Internal Server Error
+
 components:
 
   securitySchemes:
@@ -140,21 +170,6 @@ components:
       description: Access token is missing or invalid
 
   schemas:
-    ParserResultOpenApi:
-      type: object
-      required:
-        - id
-        - userParserSettingsId
-        - linkToDownloadResults
-      properties:
-        id:
-          type: integer
-          format: int64
-        userParserSettingsId:
-          type: integer
-          format: int64
-        linkToDownloadResults:
-          type: string
 
     UserParserSettingsOpenApi:
       type: object
@@ -165,8 +180,8 @@ components:
         - tagName
         - cssSelectorNextPage
         - header
-        - elementLocatorsIds
-        - outputFileType
+        - elementLocators
+        - parsingHistory
       properties:
         firstPageUrl:
           type: string
@@ -183,19 +198,46 @@ components:
           type: array
           items:
             type: string
-        elementLocatorsIds:
+        elementLocators:
           type: array
           items:
-            type: integer
-            format: int64
+            $ref: '#/components/schemas/ElementLocatorOpenApi'
+        parsingHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParserResultOpenApi'
+        parentFolderId:
+          type: integer
+          format: int64
+
+
+    ParserResultOpenApi:
+      type: object
+      required:
+        - date
+        - outputFileType
+        - userParserSettingsId
+        - linkToDownloadResults
+      properties:
+        id:
+          type: integer
+          format: int64
+        date:
+          type: string
+          format: date
+        linkToDownloadResults:
+          type: string
         outputFileType:
           type: object
           $ref: "#/components/schemas/OutputFileTypeOpenApi"
-
+        userParserSettingsId:
+          type: integer
+          format: int64
 
     ElementLocatorOpenApi:
       type: object
       required:
+        - name
         - elementType
         - pathToLocator
         - userParserSettingsId
@@ -203,6 +245,8 @@ components:
         id:
           type: integer
           format: int64
+        name:
+          type: string
         elementType:
           type: object
           $ref: "#/components/schemas/ElementTypeOpenApi"
@@ -213,6 +257,30 @@ components:
         userParserSettingsId:
           type: integer
           format: int64
+
+    FolderOpenApi:
+      type: object
+      required:
+        - userId
+        - parentFolderId
+        - folderItems
+      properties:
+        userId:
+          type: integer
+          format: int64
+        parentFolderId:
+          type: integer
+          format: int64
+        folderItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/FolderItemOpenApi'
+
+    FolderItemOpenApi:
+      type: object
+      anyOf:
+        - $ref: '#/components/schemas/FolderOpenApi'
+        - $ref: '#/components/schemas/UserParserSettingsOpenApi'
 
     OutputFileTypeOpenApi:
       type: string
