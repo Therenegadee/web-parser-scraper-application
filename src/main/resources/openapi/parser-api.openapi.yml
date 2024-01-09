@@ -7,14 +7,50 @@ servers:
     description: Development Server
 
 paths:
-  /parser/settings:
+  /parser/preset:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Parser
+      parameters:
+        - name: userId
+          in: query
+          description: User id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      summary: Get All Parser Settings Presets by User Id
+      operationId: getParserSettingsByUserId
+      responses:
+        '201':
+          description: All Users Parser Settings Presets was Retrieved Successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserParserSettingsOpenApi"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          description: Internal Server Error
     post:
       security:
         - bearerAuth: [ ]
-      summary: Set Settings for Parsing
       tags:
         - Parser
-      operationId: setParserSettings
+      parameters:
+        - name: userId
+          in: query
+          description: User id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      summary: Create Parser Settings Preset
+      operationId: createParserSettings
       requestBody:
         required: true
         content:
@@ -23,96 +59,109 @@ paths:
               $ref: "#/components/schemas/UserParserSettingsOpenApi"
       responses:
         '201':
-          description: Settings were Successfully Set
+          description: Parser Settings Preset was Created Successfully
         '401':
           $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          description: Internal Server Error
 
-  /parser/history:
+
+  /parser/preset/{presetId}:
     get:
       security:
         - bearerAuth: [ ]
-      summary: Return List of User Parser Queries History
-      tags:
-        - Parser
-      operationId: getAllParserQueries
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ParserResultOpenApi'
-        '401':
-          $ref: "#/components/responses/UnauthorizedError"
-
-  /parser/{id}:
-    get:
-      security:
-        - bearerAuth: [ ]
-      summary: Return Parser Settings and It's Result File
       tags:
         - Parser
       parameters:
-        - in: path
-          name: id
+        - name: presetId
+          in: path
+          description: Preset id
           required: true
           schema:
             type: integer
             format: int64
-            minimum: 1
-          description: Parser Settings ID
-      operationId: showParserResultsById
+      summary: Get Parser Settings Preset by Id
+      operationId: getParserSettingsById
       responses:
-        '200':
-          description: OK
+        '201':
+          description: Parser Settings was Retrieved Successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ParserResultOpenApi"
+                $ref: "#/components/schemas/UserParserSettingsOpenApi"
         '401':
           $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          description: Internal Server Error
+    delete:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Parser
+      parameters:
+        - name: presetId
+          in: path
+          description: Preset id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      summary: Delete Parser Settings Preset by Id
+      operationId: deleteParserSettingsById
+      responses:
+        '201':
+          description: Parser Settings was Deleted Successfully
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          description: Internal Server Error
     post:
       security:
         - bearerAuth: [ ]
-      summary: Start Parsing with Preset Settings with {id}
       tags:
         - Parser
       parameters:
-        - in: path
-          name: id
+        - name: presetId
+          in: path
+          description: Preset id
           required: true
           schema:
             type: integer
             format: int64
-            minimum: 1
-          description: Parser Settings ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ParserResultOpenApi"
+      summary: Run Parser With Concrete Preset by its Id and Saving New Parsing History With Current Date
       operationId: runParser
       responses:
-        '200':
-          description: OK
-        '400':
-          description: This Parser Settings wasn't found
+        '201':
+          description: Parser Settings was Deleted Successfully
         '401':
           $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          description: Internal Server Error
 
-  /parser/{id}/download:
+
+
+  /parser/preset/{presetId}/download:
     get:
       security:
         - bearerAuth: [ ]
-      summary: Download Results File With the Specific ID
+      summary: Download Results File by the Concrete Preset ID
       tags:
         - Parser
       parameters:
         - in: path
-          name: id
+          name: presetId
           required: true
           schema:
             type: integer
             format: int64
             minimum: 1
-          description: Parser Results File ID
+          description: Parser Preset ID
       operationId: downloadFile
       responses:
         200:
@@ -126,6 +175,7 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         500:
           description: Internal Server Error
+
 
   /folder:
     get:
@@ -155,6 +205,124 @@ paths:
         401:
           $ref: "#/components/responses/UnauthorizedError"
         500:
+          description: Internal Server Error
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Folder
+      summary: Creating New Folder
+      operationId: createFolder
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the user who wants to create folder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FolderOpenApi"
+      responses:
+        '201':
+          description: The folder was created successfully
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        '404':
+          description: Folder not found
+        '500':
+          description: Internal Server Error
+
+  /folder/{folderId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Folder
+      summary: Get all folder items by folder ID
+      operationId: getAllFolderItemsByFolderId
+      parameters:
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the folder to retrieve items from
+      responses:
+        '200':
+          description: The folder items were retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FolderItemOpenApi'
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        '404':
+          description: Folder not found
+        '500':
+          description: Internal Server Error
+
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Folder
+      summary: Update a folder by folder ID
+      operationId: updateFolderById
+      parameters:
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the folder to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FolderOpenApi"
+      responses:
+        '200':
+          description: The folder was updated successfully
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        '404':
+          description: Folder with such id not found
+        '500':
+          description: Internal Server Error
+
+    delete:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Folder
+      summary: Delete a folder by folder ID
+      operationId: deleteFolderById
+      parameters:
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the folder to delete
+      responses:
+        '200':
+          description: The folder was deleted successfully
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        '404':
+          description: Folder with such id not found
+        '500':
           description: Internal Server Error
 
 components:

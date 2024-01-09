@@ -25,5 +25,4 @@ public interface FolderDao {
 
     int delete(Folder folder);
 
-    int deleteAll();
 }

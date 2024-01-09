@@ -1,16 +1,14 @@
 package parser.app.webscraper.services;
 
 
-
 import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import parser.app.webscraper.dao.interfaces.ParserResultDao;
-import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.dao.interfaces.UserParserSettingsDao;
+import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.mappers.openapi.ParserResultMapper;
 import parser.app.webscraper.mappers.openapi.UserParserSettingsMapper;
 import parser.app.webscraper.models.ParserResult;
@@ -22,7 +20,6 @@ import parser.userService.openapi.model.UserParserSettingsOpenApi;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Observed
 @Service
@@ -31,44 +28,56 @@ public class ParserServiceImpl implements ParserService {
     private final ParserRunner parserRunner;
     private final UserParserSettingsMapper parserSettingsMapper;
     private final ParserResultMapper parserResultMapper;
-    private final UserParserSettingsDao parseSettingRepository;
+    private final UserParserSettingsDao userParserSettingsDao;
     private final ParserResultDao parserResultDao;
 
-    @Override
     @Observed
-    public List<ParserResultOpenApi> getAllParserQueries() {
-        return parserResultMapper.toOpenApi(parserResultDao.findAll());
-    }
-
     @Override
-    @Observed
-    public ParserResultOpenApi showParserResultsById(Long id) {
-        Optional<ParserResult> parserResultOpt = parserResultDao.findById(id);
-        if (parserResultOpt.isPresent()) {
-            return parserResultMapper.toOpenApi(parserResultOpt.get());
-        }
-        else {
-            throw new NotFoundException(String.format("Parser results with id %d wasn't found", id));
-        }
-    }
-
-    @Override
-    @Observed
-    public ResponseEntity<Void> setParserSettings(UserParserSettingsOpenApi userParserSettingsOpenApi) {
-        UserParserSetting userParserSettings = parserSettingsMapper.toUserParseSetting(userParserSettingsOpenApi);
-        parseSettingRepository.save(userParserSettings);
+    public ResponseEntity<Void> createParserSettings(Long userId, UserParserSettingsOpenApi userParserSettingsOpenApi) {
+        UserParserSetting userParserSetting = parserSettingsMapper.toUserParseSetting(userParserSettingsOpenApi);
+        userParserSetting.setUserId(userId);
+        userParserSettingsDao.save(userParserSetting);
         return ResponseEntity
-                .ok()
+                .status(201)
                 .build();
     }
 
-    @Override
     @Observed
-    public ResponseEntity<Void> runParser(Long id) {
-        Optional<UserParserSetting> userParserSettingOpt = parseSettingRepository.findById(id);
+    @Override
+    public UserParserSettingsOpenApi getParserSettingsById(Long id) {
+        UserParserSetting userParserSetting = userParserSettingsDao.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("UserParserSetting with id %d wasn't found")));
+        return parserSettingsMapper.toOpenApi(userParserSetting);
+    }
+
+    @Observed
+    @Override
+    public List<UserParserSettingsOpenApi> getAllParserSettingsByUserId(Long userId) {
+        List<UserParserSetting> userParserSetting = userParserSettingsDao.findAllByUserId(userId);;
+        return parserSettingsMapper.toOpenApi(userParserSetting);
+    }
+
+    @Observed
+    @Override
+    public ResponseEntity<Void> deleteParserSettingsById(Long id) {
+        userParserSettingsDao.deleteById(id);
+        return ResponseEntity
+                .status(204)
+                .build();
+    }
+
+    @Observed
+    @Override
+    public ResponseEntity<Void> runParser(Long id, ParserResultOpenApi parserResultOpenApi) {
+        ParserResult parserResult = parserResultMapper.toParserResult(parserResultOpenApi);
+        Optional<UserParserSetting> userParserSettingOpt = userParserSettingsDao.findById(id);
         UserParserSetting userParserSetting;
         if (userParserSettingOpt.isPresent()) {
             userParserSetting = userParserSettingOpt.get();
+            userParserSetting.getParsingHistory().add(parserResult);
+            parserResult.setUserParserSetting(userParserSetting);
+            parserResultDao.save(parserResult);
+            //todo: прописать логику запуска парсера
         } else {
 //            log.debug("userParserSetting was empty, no such object in db");
             return ResponseEntity

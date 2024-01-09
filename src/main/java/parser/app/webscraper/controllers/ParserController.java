@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import parser.app.webscraper.models.ParserResult;
 import parser.app.webscraper.services.interfaces.ParserService;
 import parser.userService.openapi.api.ParserApiDelegate;
 import parser.userService.openapi.model.ParserResultOpenApi;
@@ -19,43 +20,65 @@ import java.util.List;
 public class ParserController implements ParserApiDelegate {
     private final ParserService parserService;
 
-    @Override
     @Observed
-    public ResponseEntity<List<ParserResultOpenApi>> getAllParserQueries() {
-        return ResponseEntity
-                .ok(parserService.getAllParserQueries().stream().toList());
-
+    @Override
+    @GetMapping("/preset")
+    //    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<List<UserParserSettingsOpenApi>> getParserSettingsByUserId(
+            @RequestParam(name = "userId") Long userId
+    ) {
+        return ResponseEntity.ok(parserService.getAllParserSettingsByUserId(userId));
     }
 
-    @Override
     @Observed
-    @GetMapping("/{id}")
-//    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ParserResultOpenApi> showParserResultsById(@PathVariable("id") @Valid Long id) {
-        return ResponseEntity.ok(parserService.showParserResultsById(id));
-    }
-
     @Override
-    @Observed
-    @PostMapping("/settings")
+    @PostMapping("/preset")
 //    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<Void> setParserSettings(@RequestBody UserParserSettingsOpenApi userParserSettingsOpenApi) {
-        return parserService.setParserSettings(userParserSettingsOpenApi);
+    public ResponseEntity<Void> createParserSettings(
+            @RequestParam(name = "userId") Long userId,
+            @RequestBody UserParserSettingsOpenApi userParserSettingsOpenApi
+    ) {
+        return parserService.createParserSettings(userId, userParserSettingsOpenApi);
     }
 
-    @Override
     @Observed
-    @PostMapping("/{id}")
-//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<Void> runParser(@PathVariable("id") @Valid Long id) {
-        return parserService.runParser(id);
+    @Override
+    @GetMapping("/preset/{id}")
+    //    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<UserParserSettingsOpenApi> getParserSettingsById(
+            @PathVariable("id") @Valid Long id
+    ) {
+        return ResponseEntity.ok(parserService.getParserSettingsById(id));
     }
 
-    @Override
     @Observed
-    @GetMapping("/{id}/download")
+    @Override
+    @DeleteMapping("/preset/{id}")
+    //    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteParserSettingsById(
+            @PathVariable("id") @Valid Long id
+    ) {
+        return parserService.deleteParserSettingsById(id);
+    }
+
+    @Observed
+    @Override
+    @PostMapping("/preset/{id}")
 //    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<Resource> downloadFile(@PathVariable("id") @Valid Long id) {
+    public ResponseEntity<Void> runParser(
+            @PathVariable("id") @Valid Long id,
+            @RequestBody ParserResultOpenApi parserResultOpenApi
+    ) {
+        return parserService.runParser(id, parserResultOpenApi);
+    }
+
+    @Observed
+    @Override
+    @GetMapping("/preset/{id}/download")
+//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<Resource> downloadFile(
+            @PathVariable("id") @Valid Long id
+    ) {
         return parserService.downloadFile(id);
     }
 }

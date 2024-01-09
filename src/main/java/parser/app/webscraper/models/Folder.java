@@ -13,6 +13,6 @@ import java.util.Optional;
 public class Folder extends FolderItem {
     private Long id;
     private Long userId;
-    private Optional<Folder> parentFolder;
+    private Folder parentFolder;
     private List<FolderItem> folderItems;
 }

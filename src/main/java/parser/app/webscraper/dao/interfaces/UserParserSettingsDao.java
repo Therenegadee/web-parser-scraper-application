@@ -22,6 +22,8 @@ public interface UserParserSettingsDao {
 
     UserParserSetting update(UserParserSetting userParserSetting);
 
+    void update(List<UserParserSetting> userParserSetting);
+
     UserParserSetting updateById(Long id, UserParserSetting userParserSetting);
 
     int deleteById(Long id);

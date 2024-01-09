@@ -2,16 +2,17 @@ package parser.app.webscraper.dao;
 
 import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.relational.core.sql.SQL;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import parser.app.webscraper.dao.interfaces.FolderDao;
+import parser.app.webscraper.dao.interfaces.UserParserSettingsDao;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.mappers.jdbc.FolderRowMapper;
 import parser.app.webscraper.models.Folder;
+import parser.app.webscraper.models.UserParserSetting;
 
 import java.sql.Array;
 import java.sql.PreparedStatement;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 public class FolderJdbcTemplate implements FolderDao {
     private final JdbcTemplate jdbcTemplate;
     private final FolderRowMapper folderMapper;
+    private final UserParserSettingsDao userParserSettingsDao;
 
     @Transactional
     @Override
@@ -67,6 +69,7 @@ public class FolderJdbcTemplate implements FolderDao {
                 " VALUES(?,?) RETURNING id";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
+        Long parentId = (folder.getParentFolder() != null) ? folder.getParentFolder().getId() : null;
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -75,7 +78,7 @@ public class FolderJdbcTemplate implements FolderDao {
             Array array = connection.createArrayOf("TEXT", folder.getTags().toArray());
             ps.setArray(index++, array);
             ps.setLong(index++, folder.getUserId());
-            ps.setLong(index++, folder.getParentFolder().orElse(null).getId());
+            ps.setLong(index++, parentId);
             return ps;
         }, keyHolder);
 
@@ -98,9 +101,10 @@ public class FolderJdbcTemplate implements FolderDao {
         if (Objects.nonNull(id) && findByFolderId(id).isPresent()) {
             String query = "UPDATE folder SET name=?, tags=?, user_id=?, " +
                     "parent_folder=? WHERE id=?";
+            Long parentId = (folder.getParentFolder() != null) ? folder.getParentFolder().getId() : null;
             int rows = jdbcTemplate.update(query, folder.getName(),
                     folder.getTags().stream().collect(Collectors.toList()),
-                    folder.getUserId(), folder.getParentFolder().orElse(null).getId(), id);
+                    folder.getUserId(), parentId, id);
             if (rows != 1) {
                 throw new RuntimeException("Invalid request in SQL: " + query);
             }
@@ -113,8 +117,16 @@ public class FolderJdbcTemplate implements FolderDao {
     @Transactional
     @Override
     public int deleteById(Long id) {
-        if (Objects.nonNull(id) && findByFolderId(id).isPresent()) {
+        Optional<Folder> folderOpt = findByFolderId(id);
+        if (Objects.nonNull(id) && folderOpt.isPresent()) {
             String query = "DELETE FROM folder WHERE id=?";
+            Folder folder = folderOpt.get();
+            List<UserParserSetting> userParserSettingsToUpdate = userParserSettingsDao.findAllByParentFolderId(id);
+            userParserSettingsToUpdate
+                    .forEach(userParserSetting -> userParserSetting.setParentFolder(
+                            Objects.isNull(folder.getParentFolder()) ? null : folder.getParentFolder())
+                    );
+            userParserSettingsDao.update(userParserSettingsToUpdate);
             return jdbcTemplate.update(query, id);
         } else {
             throw new NotFoundException(String.format("Folder with id %d wasn't found", id));
@@ -127,12 +139,5 @@ public class FolderJdbcTemplate implements FolderDao {
         if (Objects.isNull(folder)) throw new IllegalArgumentException("Folder is Null!");
         Long id = folder.getId();
         return deleteById(id);
-    }
-
-    @Transactional
-    @Override
-    public int deleteAll() {
-        String query = "DELETE FROM folder";
-        return jdbcTemplate.update(query);
     }
 }

@@ -6,10 +6,13 @@ import parser.userService.openapi.model.FolderItemOpenApi;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {FolderMapper.class, UserParserSettingsMapper.class})
 public interface FolderItemMapper {
     FolderItem toFolderItem(FolderItemOpenApi folderItemOpenApi);
+
     List<FolderItem> toFolderItem(List<FolderItemOpenApi> folderItemOpenApi);
+
     FolderItemOpenApi toOpenApi(FolderItem folderItem);
+
     List<FolderItemOpenApi> toOpenApi(List<FolderItem> folderItem);
 }

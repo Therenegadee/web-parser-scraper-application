@@ -50,6 +50,8 @@ public class UserParserSettingsJdbcTemplate implements UserParserSettingsDao {
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
+        Long parentFolderId = (userParserSetting.getParentFolder() != null) ? userParserSetting.getParentFolder().getId() : null;
+
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             int index = 1;
@@ -59,7 +61,7 @@ public class UserParserSettingsJdbcTemplate implements UserParserSettingsDao {
             ps.setString(index++, userParserSetting.getTagName());
             ps.setString(index++, userParserSetting.getCssSelectorNextPage());
             ps.setArray(index++, connection.createArrayOf("TEXT", userParserSetting.getHeader().toArray()));
-            ps.setLong(index++, userParserSetting.getParentFolder().getId());
+            ps.setLong(index++, parentFolderId);
             return ps;
         }, keyHolder);
 
@@ -84,10 +86,11 @@ public class UserParserSettingsJdbcTemplate implements UserParserSettingsDao {
         if (Objects.nonNull(id) && findById(id).isPresent()) {
             String query = "UPDATE user_parser_settings SET first_page_url=?, num_of_pages_to_parse=?, class_name=?, " +
                     "tag_name=?, css_selector_next_page=?, header=?, parent_folder_id=? WHERE id=?";
+            Long parentFolderId = (userParserSetting.getParentFolder() != null) ? userParserSetting.getParentFolder().getId() : null;
             int rows = jdbcTemplate.update(query, userParserSetting.getFirstPageUrl(),
                     userParserSetting.getNumOfPagesToParse(), userParserSetting.getClassName(),
                     userParserSetting.getTagName(), userParserSetting.getCssSelectorNextPage(),
-                    userParserSetting.getHeader(), userParserSetting.getParentFolder().getId(), id);
+                    userParserSetting.getHeader(), parentFolderId, id);
 
             parserResultDao.updateAll(userParserSetting.getParsingHistory());
             elementLocatorDao.updateAll(userParserSetting.getElementLocators());
@@ -99,6 +102,11 @@ public class UserParserSettingsJdbcTemplate implements UserParserSettingsDao {
         } else {
             throw new NotFoundException(String.format("UserParserSetting with id %d wasn't found", id));
         }
+    }
+
+    @Override
+    public void update(List<UserParserSetting> userParserSetting) {
+        userParserSetting.forEach(this::update);
     }
 
     @Transactional

@@ -27,7 +27,7 @@ public class FolderRowMapper implements RowMapper<Folder> {
         List<FolderItem> folderItems = findItems(id);
         Folder folder = Folder.builder()
                 .id(id)
-                .parentFolder(findParentFolder(rs.getLong("parent_folder_id")))
+                .parentFolder(findParentFolder(rs.getLong("parent_folder_id")).orElse(null))
                 .userId(rs.getLong("user_id"))
                 .folderItems(folderItems)
                 .build();

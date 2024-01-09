@@ -9,7 +9,7 @@ import parser.userService.openapi.model.ParserResultOpenApi;
 import java.util.List;
 import java.util.Set;
 
-@Mapper(componentModel = "spring", uses = DateMapper.class)
+@Mapper(componentModel = "spring", uses = {DateMapper.class, UserParserSettingsIdMapper.class})
 public interface ParserResultMapper {
     @Mapping(target = "date", source = "date", dateFormat = "yyyy-MM-dd'T'HH:mm:ssXXX")
     ParserResult toParserResult(ParserResultOpenApi parserResultOpenApi);

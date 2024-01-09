@@ -6,7 +6,7 @@ import parser.userService.openapi.model.ElementLocatorOpenApi;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {UserParserSettingsIdMapper.class})
 public interface ElementLocatorMapper {
     ElementLocator toElementLocator(ElementLocatorOpenApi elementLocatorOpenApi);
 
