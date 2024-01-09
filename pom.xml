@@ -233,6 +233,7 @@
                             <supportingFilesToGenerate>
                                 ApiUtil.java
                             </supportingFilesToGenerate>
+                            <openapiNormalizer>REF_AS_PARENT_IN_ALLOF=true</openapiNormalizer>
                             <configOptions>
                                 <useResponseEntity>true</useResponseEntity>
                                 <delegatePattern>true</delegatePattern>

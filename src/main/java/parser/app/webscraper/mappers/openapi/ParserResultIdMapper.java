@@ -7,7 +7,6 @@ import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.models.ParserResult;
 
 import java.util.List;
-import java.util.Set;
 
 @RequiredArgsConstructor
 public class ParserResultIdMapper {

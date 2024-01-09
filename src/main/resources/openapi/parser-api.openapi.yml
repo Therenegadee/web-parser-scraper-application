@@ -172,43 +172,45 @@ components:
   schemas:
 
     UserParserSettingsOpenApi:
-      type: object
-      required:
-        - firstPageUrl
-        - numOfPagesToParse
-        - className
-        - tagName
-        - cssSelectorNextPage
-        - header
-        - elementLocators
-        - parsingHistory
-      properties:
-        firstPageUrl:
-          type: string
-        numOfPagesToParse:
-          type: integer
-          format: int32
-        className:
-          type: string
-        tagName:
-          type: string
-        cssSelectorNextPage:
-          type: string
-        header:
-          type: array
-          items:
-            type: string
-        elementLocators:
-          type: array
-          items:
-            $ref: '#/components/schemas/ElementLocatorOpenApi'
-        parsingHistory:
-          type: array
-          items:
-            $ref: '#/components/schemas/ParserResultOpenApi'
-        parentFolderId:
-          type: integer
-          format: int64
+      allOf:
+        - $ref: '#/components/schemas/FolderItemOpenApi'
+        - type: object
+          required:
+            - firstPageUrl
+            - numOfPagesToParse
+            - className
+            - tagName
+            - cssSelectorNextPage
+            - header
+            - elementLocators
+            - parsingHistory
+          properties:
+            firstPageUrl:
+              type: string
+            numOfPagesToParse:
+              type: integer
+              format: int32
+            className:
+              type: string
+            tagName:
+              type: string
+            cssSelectorNextPage:
+              type: string
+            header:
+              type: array
+              items:
+                type: string
+            elementLocators:
+              type: array
+              items:
+                $ref: '#/components/schemas/ElementLocatorOpenApi'
+            parsingHistory:
+              type: array
+              items:
+                $ref: '#/components/schemas/ParserResultOpenApi'
+            parentFolderId:
+              type: integer
+              format: int64
 
 
     ParserResultOpenApi:
@@ -224,7 +226,7 @@ components:
           format: int64
         date:
           type: string
-          format: date
+          format: date-time
         linkToDownloadResults:
           type: string
         outputFileType:
@@ -259,28 +261,34 @@ components:
           format: int64
 
     FolderOpenApi:
-      type: object
-      required:
-        - userId
-        - parentFolderId
-        - folderItems
-      properties:
-        userId:
-          type: integer
-          format: int64
-        parentFolderId:
-          type: integer
-          format: int64
-        folderItems:
-          type: array
-          items:
-            $ref: '#/components/schemas/FolderItemOpenApi'
+      allOf:
+        - $ref: '#/components/schemas/FolderItemOpenApi'
+        - type: object
+          required:
+            - userId
+            - parentFolderId
+            - folderItems
+          properties:
+            userId:
+              type: integer
+              format: int64
+            parentFolderId:
+              type: integer
+              format: int64
+            folderItems:
+              type: array
+              items:
+                $ref: '#/components/schemas/FolderItemOpenApi'
 
     FolderItemOpenApi:
       type: object
-      anyOf:
-        - $ref: '#/components/schemas/FolderOpenApi'
-        - $ref: '#/components/schemas/UserParserSettingsOpenApi'
+      properties:
+        name:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
 
     OutputFileTypeOpenApi:
       type: string

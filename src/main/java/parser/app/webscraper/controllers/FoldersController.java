@@ -32,4 +32,6 @@ public class FoldersController implements FolderApiDelegate {
     public ResponseEntity<List<FolderItemOpenApi>> getAllFolderItemsByUserId(Long userId) {
         return ResponseEntity.ok(folderService.getAllFolderItemsByUserId(userId));
     }
+
+
 }
