@@ -9,12 +9,6 @@ import java.util.Set;
 public interface FolderDao {
     Optional<Folder> findByFolderId(Long id);
 
-    List<Folder> findAllByUserId(Long id);
-
-    List<Folder> findAllByParentFolderId(Long id);
-
-    List<Folder> findAll();
-
     Folder save(Folder folder);
 
     Folder update(Folder folder);

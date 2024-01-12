@@ -177,13 +177,13 @@ paths:
           description: Internal Server Error
 
 
-  /folder:
+  /storage:
     get:
       security:
         - bearerAuth: [ ]
       tags:
-        - Folder
-      summary: Retrieving All Folder Items of User with Concrete Id
+        - storage
+      summary: Retrieving All Storage Items of User with Concrete Id
       parameters:
         - name: userId
           in: query
@@ -192,16 +192,16 @@ paths:
           schema:
             type: integer
             format: int64
-      operationId: getAllFolderItemsByUserId
+      operationId: getAllStorageItemsByUserId
       responses:
         200:
-          description: The folder items were retrieved successfully
+          description: The Storage items were retrieved successfully
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/FolderItemOpenApi"
+                  $ref: "#/components/schemas/StorageItemOpenApi"
         401:
           $ref: "#/components/responses/UnauthorizedError"
         500:
@@ -210,7 +210,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Folder
+        - Storage
       summary: Creating New Folder
       operationId: createFolder
       parameters:
@@ -237,14 +237,14 @@ paths:
         '500':
           description: Internal Server Error
 
-  /folder/{folderId}:
+  /storage/folder/{folderId}:
     get:
       security:
         - bearerAuth: [ ]
       tags:
-        - Folder
-      summary: Get all folder items by folder ID
-      operationId: getAllFolderItemsByFolderId
+        - Storage
+      summary: Get all Storage items by folder ID
+      operationId: getAllStorageItemsByFolderId
       parameters:
         - name: folderId
           in: path
@@ -255,13 +255,13 @@ paths:
           description: The ID of the folder to retrieve items from
       responses:
         '200':
-          description: The folder items were retrieved successfully
+          description: The Storage items were retrieved successfully
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/FolderItemOpenApi'
+                  $ref: '#/components/schemas/StorageItemOpenApi'
         401:
           $ref: "#/components/responses/UnauthorizedError"
         '404':
@@ -273,7 +273,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Folder
+        - Storage
       summary: Update a folder by folder ID
       operationId: updateFolderById
       parameters:
@@ -304,7 +304,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Folder
+        - Storage
       summary: Delete a folder by folder ID
       operationId: deleteFolderById
       parameters:
@@ -341,7 +341,7 @@ components:
 
     UserParserSettingsOpenApi:
       allOf:
-        - $ref: '#/components/schemas/FolderItemOpenApi'
+        - $ref: '#/components/schemas/StorageItemOpenApi'
         - type: object
           required:
             - firstPageUrl
@@ -353,6 +353,12 @@ components:
             - elementLocators
             - parsingHistory
           properties:
+            name:
+              type: string
+            tags:
+              type: array
+              items:
+                type: string
             firstPageUrl:
               type: string
             numOfPagesToParse:
@@ -430,7 +436,7 @@ components:
 
     FolderOpenApi:
       allOf:
-        - $ref: '#/components/schemas/FolderItemOpenApi'
+        - $ref: '#/components/schemas/StorageItemOpenApi'
         - type: object
           required:
             - userId
@@ -446,9 +452,9 @@ components:
             folderItems:
               type: array
               items:
-                $ref: '#/components/schemas/FolderItemOpenApi'
+                $ref: '#/components/schemas/StorageItemOpenApi'
 
-    FolderItemOpenApi:
+    StorageItemOpenApi:
       type: object
       properties:
         name:

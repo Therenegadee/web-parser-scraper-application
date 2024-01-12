@@ -6,22 +6,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import parser.app.webscraper.services.interfaces.FolderService;
-import parser.userService.openapi.api.FolderApiDelegate;
-import parser.userService.openapi.model.FolderItemOpenApi;
+import parser.userService.openapi.api.StorageApiDelegate;
 import parser.userService.openapi.model.FolderOpenApi;
+import parser.userService.openapi.model.StorageItemOpenApi;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/folder")
 @RequiredArgsConstructor
-public class FoldersController implements FolderApiDelegate {
+public class StorageController implements StorageApiDelegate {
     private final FolderService folderService;
 
     @Observed
     @GetMapping
     @Override
-    public ResponseEntity<List<FolderItemOpenApi>> getAllFolderItemsByUserId(
+    public ResponseEntity<List<StorageItemOpenApi>> getAllStorageItemsByUserId(
             @RequestParam(name = "userId") Long userId
     ) {
         return ResponseEntity.ok(folderService.getAllFolderItemsByUserId(userId));
@@ -41,7 +41,7 @@ public class FoldersController implements FolderApiDelegate {
     @Observed
     @GetMapping("/{folderId}")
     @Override
-    public ResponseEntity<List<FolderItemOpenApi>> getAllFolderItemsByFolderId(
+    public ResponseEntity<List<StorageItemOpenApi>> getAllStorageItemsByFolderId(
             @PathVariable(name = "folderId") @Valid Long folderId
     ) {
         return ResponseEntity.ok(folderService.getAllFolderItemsByFolderId(folderId));

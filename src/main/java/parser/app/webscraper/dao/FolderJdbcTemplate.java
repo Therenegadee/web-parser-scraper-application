@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import parser.app.webscraper.dao.interfaces.FolderDao;
 import parser.app.webscraper.dao.interfaces.UserParserSettingsDao;
 import parser.app.webscraper.exceptions.NotFoundException;
-import parser.app.webscraper.mappers.jdbc.StorageRowMapper;
 import parser.app.webscraper.mappers.jdbc.FolderRowMapper;
 import parser.app.webscraper.models.Folder;
 import parser.app.webscraper.models.UserParserSetting;
@@ -27,7 +26,6 @@ import java.util.stream.Collectors;
 public class FolderJdbcTemplate implements FolderDao {
     private final JdbcTemplate jdbcTemplate;
     private final FolderRowMapper folderMapper;
-    private final StorageRowMapper folderItemMapper;
     private final UserParserSettingsDao userParserSettingsDao;
 
     @Transactional
@@ -42,25 +40,10 @@ public class FolderJdbcTemplate implements FolderDao {
 
     @Transactional
     @Override
-    public List<Folder> findAllByParentFolderId(Long id) {
-        String query = "SELECT * FROM folder WHERE parent_folder_id=?";
-        return new ArrayList<>(jdbcTemplate
-                .query(query, folderMapper, id));
-    }
-
-    @Transactional
-    @Override
-    public List<Folder> findAll() {
-        String query = "SELECT * FROM folder";
-        return new ArrayList<>(jdbcTemplate.query(query, folderMapper));
-    }
-
-    @Transactional
-    @Override
     public Folder save(Folder folder) {
         if (Objects.isNull(folder)) throw new IllegalArgumentException("Folder is Null!");
-        String query = "INSERT INTO folder (user_id,parent_folder_id)" +
-                " VALUES(?,?) RETURNING id";
+        String query = "INSERT INTO folder (user_id,parent_folder_id) " +
+                "VALUES(?,?) RETURNING id";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         Long parentId = (folder.getParentFolder() != null) ? folder.getParentFolder().getId() : null;

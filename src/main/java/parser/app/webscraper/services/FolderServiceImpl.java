@@ -6,14 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import parser.app.webscraper.dao.interfaces.FolderDao;
 import parser.app.webscraper.dao.interfaces.UserParserSettingsDao;
-import parser.app.webscraper.mappers.openapi.FolderItemMapper;
+import parser.app.webscraper.mappers.openapi.StorageItemMapper;
 import parser.app.webscraper.mappers.openapi.FolderMapper;
 import parser.app.webscraper.mappers.openapi.UserParserSettingsMapper;
 import parser.app.webscraper.models.Folder;
 import parser.app.webscraper.models.StorageItem;
 import parser.app.webscraper.services.interfaces.FolderService;
-import parser.userService.openapi.model.FolderItemOpenApi;
 import parser.userService.openapi.model.FolderOpenApi;
+import parser.userService.openapi.model.StorageItemOpenApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +23,13 @@ import java.util.List;
 public class FolderServiceImpl implements FolderService {
     private final FolderDao folderDao;
     private final UserParserSettingsDao userParserSettingsDao;
-    private final FolderItemMapper folderItemMapper;
+    private final StorageItemMapper storageItemMapper;
     private final FolderMapper folderMapper;
     private final UserParserSettingsMapper userParserSettingsMapper;
 
     @Observed
     @Override
-    public List<FolderItemOpenApi> getAllFolderItemsByUserId(Long userId) {
+    public List<StorageItemOpenApi> getAllFolderItemsByUserId(Long userId) {
         List<StorageItem> storageItems = new ArrayList<>();
         storageItems.addAll(folderDao.findAllByUserId(userId));
         storageItems.addAll(userParserSettingsDao.findAllByUserId(userId)
@@ -37,16 +37,16 @@ public class FolderServiceImpl implements FolderService {
                 .filter(settings -> settings.getParentFolder() == null)
                 .toList()
         );
-        return folderItemMapper.toOpenApi(storageItems);
+        return storageItemMapper.toOpenApi(storageItems);
     }
 
     @Observed
     @Override
-    public List<FolderItemOpenApi> getAllFolderItemsByFolderId(Long folderId) {
+    public List<StorageItemOpenApi> getAllFolderItemsByFolderId(Long folderId) {
         List<StorageItem> storageItems = new ArrayList<>();
         storageItems.addAll(folderDao.findAllByParentFolderId(folderId));
         storageItems.addAll(folderDao.findAllByParentFolderId(folderId));
-        return folderItemMapper.toOpenApi(storageItems);
+        return storageItemMapper.toOpenApi(storageItems);
     }
 
     @Observed
