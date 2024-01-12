@@ -3,16 +3,19 @@ package parser.app.webscraper.models;
 import lombok.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Folder extends FolderItem {
+public class Folder extends StorageItem {
     private Long id;
     private Long userId;
     private Folder parentFolder;
-    private List<FolderItem> folderItems;
+    private List<StorageItem> storageItems;
+
+    public void addStorageItem(StorageItem storageItem) {
+        storageItems.add(storageItem);
+    }
 }

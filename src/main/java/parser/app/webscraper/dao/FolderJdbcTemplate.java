@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import parser.app.webscraper.dao.interfaces.FolderDao;
 import parser.app.webscraper.dao.interfaces.UserParserSettingsDao;
 import parser.app.webscraper.exceptions.NotFoundException;
+import parser.app.webscraper.mappers.jdbc.StorageRowMapper;
 import parser.app.webscraper.mappers.jdbc.FolderRowMapper;
 import parser.app.webscraper.models.Folder;
 import parser.app.webscraper.models.UserParserSetting;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class FolderJdbcTemplate implements FolderDao {
     private final JdbcTemplate jdbcTemplate;
     private final FolderRowMapper folderMapper;
+    private final StorageRowMapper folderItemMapper;
     private final UserParserSettingsDao userParserSettingsDao;
 
     @Transactional
@@ -36,14 +38,6 @@ public class FolderJdbcTemplate implements FolderDao {
                 .query(query, folderMapper, id)
                 .stream()
                 .findFirst();
-    }
-
-    @Transactional
-    @Override
-    public List<Folder> findAllByUserId(Long id) {
-        String query = "SELECT * FROM folder WHERE user_id=?";
-        return new ArrayList<>(jdbcTemplate
-                .query(query, folderMapper, id));
     }
 
     @Transactional

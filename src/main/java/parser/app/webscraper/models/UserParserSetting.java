@@ -3,7 +3,6 @@ package parser.app.webscraper.models;
 
 import lombok.*;
 
-import java.util.HashSet;
 import java.util.List;
 
 @Getter
@@ -11,7 +10,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserParserSetting extends FolderItem {
+public class UserParserSetting extends StorageItem {
     private Long id;
     private String firstPageUrl;
     private int numOfPagesToParse;

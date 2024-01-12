@@ -10,7 +10,7 @@ import parser.app.webscraper.mappers.openapi.FolderItemMapper;
 import parser.app.webscraper.mappers.openapi.FolderMapper;
 import parser.app.webscraper.mappers.openapi.UserParserSettingsMapper;
 import parser.app.webscraper.models.Folder;
-import parser.app.webscraper.models.FolderItem;
+import parser.app.webscraper.models.StorageItem;
 import parser.app.webscraper.services.interfaces.FolderService;
 import parser.userService.openapi.model.FolderItemOpenApi;
 import parser.userService.openapi.model.FolderOpenApi;
@@ -30,23 +30,23 @@ public class FolderServiceImpl implements FolderService {
     @Observed
     @Override
     public List<FolderItemOpenApi> getAllFolderItemsByUserId(Long userId) {
-        List<FolderItem> folderItems = new ArrayList<>();
-        folderItems.addAll(folderDao.findAllByUserId(userId));
-        folderItems.addAll(userParserSettingsDao.findAllByUserId(userId)
+        List<StorageItem> storageItems = new ArrayList<>();
+        storageItems.addAll(folderDao.findAllByUserId(userId));
+        storageItems.addAll(userParserSettingsDao.findAllByUserId(userId)
                 .stream()
                 .filter(settings -> settings.getParentFolder() == null)
                 .toList()
         );
-        return folderItemMapper.toOpenApi(folderItems);
+        return folderItemMapper.toOpenApi(storageItems);
     }
 
     @Observed
     @Override
     public List<FolderItemOpenApi> getAllFolderItemsByFolderId(Long folderId) {
-        List<FolderItem> folderItems = new ArrayList<>();
-        folderItems.addAll(folderDao.findAllByParentFolderId(folderId));
-        folderItems.addAll(folderDao.findAllByParentFolderId(folderId));
-        return folderItemMapper.toOpenApi(folderItems);
+        List<StorageItem> storageItems = new ArrayList<>();
+        storageItems.addAll(folderDao.findAllByParentFolderId(folderId));
+        storageItems.addAll(folderDao.findAllByParentFolderId(folderId));
+        return folderItemMapper.toOpenApi(storageItems);
     }
 
     @Observed

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import parser.app.webscraper.dao.interfaces.FolderDao;
 import parser.app.webscraper.dao.interfaces.UserParserSettingsDao;
 import parser.app.webscraper.models.Folder;
-import parser.app.webscraper.models.FolderItem;
+import parser.app.webscraper.models.StorageItem;
 import parser.app.webscraper.models.UserParserSetting;
 
 import java.sql.Array;
@@ -24,12 +24,12 @@ public class FolderRowMapper implements RowMapper<Folder> {
     @Override
     public Folder mapRow(ResultSet rs, int rowNum) throws SQLException {
         Long id = rs.getLong("id");
-        List<FolderItem> folderItems = findItems(id);
+        List<StorageItem> storageItems = findItems(id);
         Folder folder = Folder.builder()
                 .id(id)
                 .parentFolder(findParentFolder(rs.getLong("parent_folder_id")).orElse(null))
                 .userId(rs.getLong("user_id"))
-                .folderItems(folderItems)
+                .storageItems(storageItems)
                 .build();
         folder.setName(rs.getString("name"));
         Array tagsArr = rs.getArray("tags");
@@ -53,8 +53,8 @@ public class FolderRowMapper implements RowMapper<Folder> {
 
     }
 
-    private List<FolderItem> findItems(Long folderId) {
-        List<FolderItem> outputList = new ArrayList<>();
+    private List<StorageItem> findItems(Long folderId) {
+        List<StorageItem> outputList = new ArrayList<>();
         List<Folder> subfolders = folderDao.findAllByParentFolderId(folderId);
         List<UserParserSetting> parserSettings = userParserSettingsDao.findAllByParentFolderId(folderId);
         if (Objects.nonNull(parserSettings)) {
@@ -62,7 +62,7 @@ public class FolderRowMapper implements RowMapper<Folder> {
         }
         if(Objects.nonNull(subfolders)) {
             for (Folder folder : subfolders) {
-                folder.setFolderItems(findItems(folder.getId()));
+                folder.setStorageItems(findItems(folder.getId()));
             }
             outputList.addAll(subfolders);
         }

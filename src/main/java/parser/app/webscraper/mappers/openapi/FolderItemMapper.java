@@ -1,18 +1,18 @@
 package parser.app.webscraper.mappers.openapi;
 
 import org.mapstruct.Mapper;
-import parser.app.webscraper.models.FolderItem;
+import parser.app.webscraper.models.StorageItem;
 import parser.userService.openapi.model.FolderItemOpenApi;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {FolderMapper.class, UserParserSettingsMapper.class})
 public interface FolderItemMapper {
-    FolderItem toFolderItem(FolderItemOpenApi folderItemOpenApi);
+    StorageItem toFolderItem(FolderItemOpenApi folderItemOpenApi);
 
-    List<FolderItem> toFolderItem(List<FolderItemOpenApi> folderItemOpenApi);
+    List<StorageItem> toFolderItem(List<FolderItemOpenApi> folderItemOpenApi);
 
-    FolderItemOpenApi toOpenApi(FolderItem folderItem);
+    FolderItemOpenApi toOpenApi(StorageItem storageItem);
 
-    List<FolderItemOpenApi> toOpenApi(List<FolderItem> folderItem);
+    List<FolderItemOpenApi> toOpenApi(List<StorageItem> storageItem);
 }
