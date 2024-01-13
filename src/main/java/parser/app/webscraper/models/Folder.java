@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Folder extends StorageItem {
     private Long id;
-    private Long userId;
+    private Storage storage;
     private Folder parentFolder;
     private List<StorageItem> storageItems;
 

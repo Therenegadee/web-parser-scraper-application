@@ -21,4 +21,5 @@ public class UserParserSetting extends StorageItem {
     private List<ElementLocator> elementLocators;
     private List<ParserResult> parsingHistory;
     private Folder parentFolder;
+    private Storage storage;
 }

@@ -1,16 +1,16 @@
 package parser.app.webscraper.services.interfaces;
 
 import org.springframework.http.ResponseEntity;
-import parser.userService.openapi.model.FolderItemOpenApi;
 import parser.userService.openapi.model.FolderOpenApi;
 import parser.userService.openapi.model.StorageItemOpenApi;
+import parser.userService.openapi.model.StorageOpenApi;
 
 import java.util.List;
 
-public interface FolderService {
-    List<StorageItemOpenApi> getAllFolderItemsByUserId(Long userId);
+public interface StorageService {
+    StorageOpenApi getStorageByUserId(Long userId);
 
-    List<StorageItemOpenApi> getAllFolderItemsByFolderId(Long folderId);
+    FolderOpenApi getFolderByFolderId(Long folderId);
 
     ResponseEntity<Void> createNewFolder(Long userId, FolderOpenApi folderOpenApi);
 

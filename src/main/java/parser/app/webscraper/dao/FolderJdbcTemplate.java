@@ -20,6 +20,8 @@ import java.sql.Statement;
 import java.util.*;
 import java.util.stream.Collectors;
 
+//TODO: пофиксить у всех ентити мапперы и инсерты/селекты из бд
+
 @Observed
 @Repository
 @RequiredArgsConstructor

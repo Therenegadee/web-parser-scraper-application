@@ -192,20 +192,20 @@ paths:
           schema:
             type: integer
             format: int64
-      operationId: getAllStorageItemsByUserId
+      operationId: getStorageByUserId
       responses:
         200:
-          description: The Storage items were retrieved successfully
+          description: The Storage was retrieved successfully
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/StorageItemOpenApi"
+                $ref: "#/components/schemas/StorageOpenApi"
         401:
           $ref: "#/components/responses/UnauthorizedError"
         500:
           description: Internal Server Error
+
+  /storage/folder/new:
     post:
       security:
         - bearerAuth: [ ]
@@ -243,8 +243,8 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Storage
-      summary: Get all Storage items by folder ID
-      operationId: getAllStorageItemsByFolderId
+      summary: Get Folder by Folder ID
+      operationId: getFolderByFolderId
       parameters:
         - name: folderId
           in: path
@@ -252,16 +252,14 @@ paths:
           schema:
             type: integer
             format: int64
-          description: The ID of the folder to retrieve items from
+          description: The ID of the folder to retrieve
       responses:
         '200':
-          description: The Storage items were retrieved successfully
+          description: The Folder was retrieved successfully
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/StorageItemOpenApi'
+                $ref: '#/components/schemas/FolderOpenApi'
         401:
           $ref: "#/components/responses/UnauthorizedError"
         '404':
@@ -344,6 +342,7 @@ components:
         - $ref: '#/components/schemas/StorageItemOpenApi'
         - type: object
           required:
+            - storageId
             - firstPageUrl
             - numOfPagesToParse
             - className
@@ -353,6 +352,12 @@ components:
             - elementLocators
             - parsingHistory
           properties:
+            id:
+              type: integer
+              format: int64
+            storageId:
+              type: integer
+              format: int64
             name:
               type: string
             tags:
@@ -439,11 +444,11 @@ components:
         - $ref: '#/components/schemas/StorageItemOpenApi'
         - type: object
           required:
-            - userId
+            - storageId
             - parentFolderId
             - folderItems
           properties:
-            userId:
+            storageId:
               type: integer
               format: int64
             parentFolderId:
@@ -453,6 +458,17 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/StorageItemOpenApi'
+
+    StorageOpenApi:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+        storageItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorageItemOpenApi'
 
     StorageItemOpenApi:
       type: object

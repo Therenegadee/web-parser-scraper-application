@@ -42,6 +42,7 @@ public class StorageRowMapper implements RowMapper<Storage> {
                     folder.setId(folderId);
                     folderMap.get(folderId).addStorageItem(folder);
                 }
+                folder.setStorage(storage);
                 folderMap.put(folderId, folder);
             }
 
@@ -67,6 +68,7 @@ public class StorageRowMapper implements RowMapper<Storage> {
                     userParserSetting.setParentFolder(folderMap.get(parentFolderId));
                     folderMap.get(parentFolderId).addStorageItem(userParserSetting);
                 }
+                userParserSetting.setStorage(storage);
                 settingsMap.put(settingsId, userParserSetting);
             }
         }

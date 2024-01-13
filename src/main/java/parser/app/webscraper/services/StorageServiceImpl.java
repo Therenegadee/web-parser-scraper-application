@@ -5,48 +5,48 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import parser.app.webscraper.dao.interfaces.FolderDao;
+import parser.app.webscraper.dao.interfaces.StorageDao;
 import parser.app.webscraper.dao.interfaces.UserParserSettingsDao;
+import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.mappers.openapi.StorageItemMapper;
 import parser.app.webscraper.mappers.openapi.FolderMapper;
+import parser.app.webscraper.mappers.openapi.StorageMapper;
 import parser.app.webscraper.mappers.openapi.UserParserSettingsMapper;
 import parser.app.webscraper.models.Folder;
+import parser.app.webscraper.models.Storage;
 import parser.app.webscraper.models.StorageItem;
-import parser.app.webscraper.services.interfaces.FolderService;
+import parser.app.webscraper.services.interfaces.StorageService;
 import parser.userService.openapi.model.FolderOpenApi;
 import parser.userService.openapi.model.StorageItemOpenApi;
+import parser.userService.openapi.model.StorageOpenApi;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class FolderServiceImpl implements FolderService {
+public class StorageServiceImpl implements StorageService {
     private final FolderDao folderDao;
+    private final StorageDao storageDao;
     private final UserParserSettingsDao userParserSettingsDao;
     private final StorageItemMapper storageItemMapper;
+    private final StorageMapper storageMapper;
     private final FolderMapper folderMapper;
     private final UserParserSettingsMapper userParserSettingsMapper;
 
     @Observed
     @Override
-    public List<StorageItemOpenApi> getAllFolderItemsByUserId(Long userId) {
-        List<StorageItem> storageItems = new ArrayList<>();
-        storageItems.addAll(folderDao.findAllByUserId(userId));
-        storageItems.addAll(userParserSettingsDao.findAllByUserId(userId)
-                .stream()
-                .filter(settings -> settings.getParentFolder() == null)
-                .toList()
-        );
-        return storageItemMapper.toOpenApi(storageItems);
+    public StorageOpenApi getStorageByUserId(Long userId) {
+        Storage storage = storageDao.findByUserId(userId);
+        return storageMapper.toOpenApi(storage);
     }
 
     @Observed
     @Override
-    public List<StorageItemOpenApi> getAllFolderItemsByFolderId(Long folderId) {
-        List<StorageItem> storageItems = new ArrayList<>();
-        storageItems.addAll(folderDao.findAllByParentFolderId(folderId));
-        storageItems.addAll(folderDao.findAllByParentFolderId(folderId));
-        return storageItemMapper.toOpenApi(storageItems);
+    public FolderOpenApi getFolderByFolderId(Long folderId) {
+        return folderMapper
+                .toOpenApi(folderDao.findByFolderId(folderId)
+                        .orElseThrow(() -> new NotFoundException(String.format("Folder with idd %d wasn't found", folderId))));
     }
 
     @Observed

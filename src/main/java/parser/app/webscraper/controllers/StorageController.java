@@ -5,65 +5,64 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import parser.app.webscraper.services.interfaces.FolderService;
+import parser.app.webscraper.services.interfaces.StorageService;
 import parser.userService.openapi.api.StorageApiDelegate;
 import parser.userService.openapi.model.FolderOpenApi;
-import parser.userService.openapi.model.StorageItemOpenApi;
+import parser.userService.openapi.model.StorageOpenApi;
 
-import java.util.List;
 
 @RestController
-@RequestMapping("/api/folder")
+@RequestMapping("/api/storage")
 @RequiredArgsConstructor
 public class StorageController implements StorageApiDelegate {
-    private final FolderService folderService;
+    private final StorageService storageService;
 
     @Observed
     @GetMapping
     @Override
-    public ResponseEntity<List<StorageItemOpenApi>> getAllStorageItemsByUserId(
+    public ResponseEntity<StorageOpenApi> getStorageByUserId (
             @RequestParam(name = "userId") Long userId
     ) {
-        return ResponseEntity.ok(folderService.getAllFolderItemsByUserId(userId));
+        return ResponseEntity.ok(storageService.getStorageByUserId(userId));
     }
 
     @Observed
-    @PostMapping
+    @PostMapping("/folder/new")
     @Override
     public ResponseEntity<Void> createFolder(
             @RequestParam(name = "userId") @Valid Long userId,
             @RequestBody FolderOpenApi folderOpenApi
     ) {
-        return folderService.createNewFolder(userId, folderOpenApi);
+        return storageService.createNewFolder(userId, folderOpenApi);
     }
 
 
     @Observed
-    @GetMapping("/{folderId}")
+    @GetMapping("/folder/{folderId}")
     @Override
-    public ResponseEntity<List<StorageItemOpenApi>> getAllStorageItemsByFolderId(
+    public ResponseEntity<FolderOpenApi> getFolderByFolderId(
             @PathVariable(name = "folderId") @Valid Long folderId
     ) {
-        return ResponseEntity.ok(folderService.getAllFolderItemsByFolderId(folderId));
+        return ResponseEntity.ok(storageService.getFolderByFolderId(folderId));
     }
 
     @Observed
-    @PutMapping("/{folderId}")
+    @PutMapping("/folder/{folderId}")
     @Override
     public ResponseEntity<Void> updateFolderById(
             @PathVariable(name = "folderId") @Valid Long folderId,
             @RequestBody FolderOpenApi folderOpenApi
     ) {
-        return folderService.updateFolderById(folderId, folderOpenApi);
+        return storageService.updateFolderById(folderId, folderOpenApi);
     }
 
     @Observed
-    @DeleteMapping("/{folderId}")
+    @DeleteMapping("/folder/{folderId}")
     @Override
     public ResponseEntity<Void> deleteFolderById(
             @PathVariable(name = "folderId") @Valid Long folderId
     ) {
-        return folderService.deleteFolderById(folderId);
+        return storageService.deleteFolderById(folderId);
     }
 
 }
