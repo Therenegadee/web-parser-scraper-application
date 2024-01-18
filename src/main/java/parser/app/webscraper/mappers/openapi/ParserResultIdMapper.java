@@ -1,7 +1,7 @@
 package parser.app.webscraper.mappers.openapi;
 
 import lombok.RequiredArgsConstructor;
-import parser.app.webscraper.dao.jdbc.interfaces.ParserResultDao;
+import parser.app.webscraper.dao.interfaces.ParserResultDao;
 import parser.app.webscraper.exceptions.BadRequestException;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.models.ParserResult;

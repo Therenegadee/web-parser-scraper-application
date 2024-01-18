@@ -3,7 +3,7 @@ package parser.app.webscraper.mappers.jdbc;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import parser.app.webscraper.dao.jdbc.interfaces.UserParserSettingsDao;
+import parser.app.webscraper.dao.interfaces.UserParserSettingsDao;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.models.ParserResult;
 import parser.app.webscraper.models.UserParserSetting;

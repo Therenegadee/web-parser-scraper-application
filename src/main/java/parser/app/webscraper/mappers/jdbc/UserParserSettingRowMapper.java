@@ -3,9 +3,9 @@ package parser.app.webscraper.mappers.jdbc;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import parser.app.webscraper.dao.jdbc.interfaces.ElementLocatorDao;
-import parser.app.webscraper.dao.jdbc.interfaces.FolderDao;
-import parser.app.webscraper.dao.jdbc.interfaces.ParserResultDao;
+import parser.app.webscraper.dao.interfaces.ElementLocatorDao;
+import parser.app.webscraper.dao.interfaces.FolderDao;
+import parser.app.webscraper.dao.interfaces.ParserResultDao;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.models.ElementLocator;
 import parser.app.webscraper.models.Folder;
@@ -16,6 +16,7 @@ import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 @Component

@@ -1,10 +1,12 @@
-package parser.app.webscraper.dao.jdbc.interfaces;
+package parser.app.webscraper.dao.interfaces;
 
 import org.springframework.stereotype.Repository;
 import parser.app.webscraper.models.UserParserSetting;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface UserParserSettingsDao {

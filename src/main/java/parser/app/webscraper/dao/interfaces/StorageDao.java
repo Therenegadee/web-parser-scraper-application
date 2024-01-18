@@ -1,4 +1,4 @@
-package parser.app.webscraper.dao.jdbc.interfaces;
+package parser.app.webscraper.dao.interfaces;
 
 import parser.app.webscraper.models.Storage;
 
