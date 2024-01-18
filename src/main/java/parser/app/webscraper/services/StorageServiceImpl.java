@@ -4,9 +4,9 @@ import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import parser.app.webscraper.dao.interfaces.FolderDao;
-import parser.app.webscraper.dao.interfaces.StorageDao;
-import parser.app.webscraper.dao.interfaces.UserParserSettingsDao;
+import parser.app.webscraper.dao.jdbc.interfaces.FolderDao;
+import parser.app.webscraper.dao.jdbc.interfaces.StorageDao;
+import parser.app.webscraper.dao.jdbc.interfaces.UserParserSettingsDao;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.mappers.openapi.StorageItemMapper;
 import parser.app.webscraper.mappers.openapi.FolderMapper;
@@ -14,14 +14,9 @@ import parser.app.webscraper.mappers.openapi.StorageMapper;
 import parser.app.webscraper.mappers.openapi.UserParserSettingsMapper;
 import parser.app.webscraper.models.Folder;
 import parser.app.webscraper.models.Storage;
-import parser.app.webscraper.models.StorageItem;
 import parser.app.webscraper.services.interfaces.StorageService;
 import parser.userService.openapi.model.FolderOpenApi;
-import parser.userService.openapi.model.StorageItemOpenApi;
 import parser.userService.openapi.model.StorageOpenApi;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

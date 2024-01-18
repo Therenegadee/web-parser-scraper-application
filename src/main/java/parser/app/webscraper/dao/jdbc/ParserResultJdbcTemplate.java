@@ -1,4 +1,4 @@
-package parser.app.webscraper.dao;
+package parser.app.webscraper.dao.jdbc;
 
 import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +7,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import parser.app.webscraper.dao.interfaces.ParserResultDao;
+import parser.app.webscraper.dao.jdbc.interfaces.ParserResultDao;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.mappers.jdbc.ParserResultRowMapper;
 import parser.app.webscraper.models.ParserResult;

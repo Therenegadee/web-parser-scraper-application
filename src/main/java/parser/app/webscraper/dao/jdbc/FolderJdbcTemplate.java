@@ -1,4 +1,4 @@
-package parser.app.webscraper.dao;
+package parser.app.webscraper.dao.jdbc;
 
 import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
@@ -7,8 +7,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import parser.app.webscraper.dao.interfaces.FolderDao;
-import parser.app.webscraper.dao.interfaces.UserParserSettingsDao;
+import parser.app.webscraper.dao.jdbc.interfaces.FolderDao;
+import parser.app.webscraper.dao.jdbc.interfaces.UserParserSettingsDao;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.mappers.jdbc.FolderRowMapper;
 import parser.app.webscraper.models.Folder;
@@ -33,11 +33,20 @@ public class FolderJdbcTemplate implements FolderDao {
     @Transactional
     @Override
     public Optional<Folder> findByFolderId(Long id) {
-        String query = "SELECT * FROM folder WHERE id=?";
+        String query = "SELECT * FROM folder f" +
+                "WHERE id=?";
         return jdbcTemplate
                 .query(query, folderMapper, id)
                 .stream()
                 .findFirst();
+    }
+
+    @Transactional
+    @Override
+    public List<Folder> findByFolderId(long minId, long maxId) {
+        String query = "SELECT * FROM folder f" +
+                "WHERE id BETWEEN ? AND ?";
+        return jdbcTemplate.query(query, folderMapper, minId, maxId);
     }
 
     @Transactional
@@ -54,9 +63,9 @@ public class FolderJdbcTemplate implements FolderDao {
             PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             int index = 1;
             ps.setString(index++, folder.getName());
-            Array array = connection.createArrayOf("TEXT", folder.getTags().toArray());
-            ps.setArray(index++, array);
-            ps.setLong(index++, folder.getUserId());
+            Array tags = connection.createArrayOf("TEXT", folder.getTags().toArray());
+            ps.setArray(index++, tags);
+            ps.setLong(index++, folder.getStorage().getId());
             ps.setLong(index++, parentId);
             return ps;
         }, keyHolder);

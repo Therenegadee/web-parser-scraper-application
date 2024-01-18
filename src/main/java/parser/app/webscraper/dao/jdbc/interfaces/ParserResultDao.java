@@ -1,4 +1,4 @@
-package parser.app.webscraper.dao.interfaces;
+package parser.app.webscraper.dao.jdbc.interfaces;
 
 import org.springframework.stereotype.Repository;
 import parser.app.webscraper.models.ParserResult;
