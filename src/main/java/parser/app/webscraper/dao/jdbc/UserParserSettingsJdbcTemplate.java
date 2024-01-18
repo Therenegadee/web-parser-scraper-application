@@ -31,14 +31,47 @@ public class UserParserSettingsJdbcTemplate implements UserParserSettingsDao {
     @Override
     public Optional<UserParserSetting> findById(Long id) {
         String query = "SELECT * FROM user_parser_settings WHERE id=?";
-        return jdbcTemplate.query(query, settingMapper, id).stream().findFirst();
+        return jdbcTemplate
+                .query(query, settingMapper, id)
+                .stream()
+                .findFirst();
     }
 
+    @Transactional
     @Override
     public List<UserParserSetting> findAllByParentFolderId(Long id) {
-        String query = "SELECT * FROM user_parser_settings WHERE parent_folder_id=?";
+        String query = "SELECT * FROM user_parser_settings " +
+                "WHERE parent_folder_id = ? " +
+                "ORDER BY parent_folder_id NULLS FIRST, id;";
         return new ArrayList<>(jdbcTemplate
                 .query(query, settingMapper, id));
+    }
+
+    @Transactional
+    @Override
+    public List<UserParserSetting> findAllByStorageId(Long id) {
+        String query = "SELECT * FROM user_parser_settings " +
+                "WHERE storage_id = ? " +
+                "ORDER BY parent_folder_id NULLS FIRST, id;";
+        return new ArrayList<>(jdbcTemplate
+                .query(query, settingMapper, id));
+    }
+
+    @Transactional
+    @Override
+    public List<UserParserSetting> findAllByUserId(Long id) {
+        String query = "SELECT us.* FROM user_parser_settings us " +
+                "JOIN storage st ON st.id = us.storage_id " +
+                "WHERE user_id = ? " +
+                "ORDER BY parent_folder_id NULLS FIRST, id;";
+        return new ArrayList<>(jdbcTemplate.query(query, settingMapper, id));
+    }
+
+    @Transactional
+    @Override
+    public List<UserParserSetting> findAll() {
+        String query = "SELECT * FROM user_parser_settings";
+        return new ArrayList<>(jdbcTemplate.query(query, settingMapper));
     }
 
     @Transactional
@@ -107,20 +140,6 @@ public class UserParserSettingsJdbcTemplate implements UserParserSettingsDao {
     @Override
     public void update(List<UserParserSetting> userParserSetting) {
         userParserSetting.forEach(this::update);
-    }
-
-    @Transactional
-    @Override
-    public List<UserParserSetting> findAll() {
-        String query = "SELECT * FROM user_parser_settings";
-        return new ArrayList<>(jdbcTemplate.query(query, settingMapper));
-    }
-
-    @Transactional
-    @Override
-    public List<UserParserSetting> findAllByUserId(Long id) {
-        String query = "SELECT * FROM user_parser_settings WHERE user_id=?";
-        return new ArrayList<>(jdbcTemplate.query(query, settingMapper, id));
     }
 
     @Transactional

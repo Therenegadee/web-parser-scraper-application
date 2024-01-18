@@ -12,6 +12,8 @@ public interface UserParserSettingsDao {
 
     List<UserParserSetting> findAllByParentFolderId(Long id);
 
+    List<UserParserSetting> findAllByStorageId(Long id);
+
     List<UserParserSetting> findAll();
 
     List<UserParserSetting> findAllByUserId(Long id);

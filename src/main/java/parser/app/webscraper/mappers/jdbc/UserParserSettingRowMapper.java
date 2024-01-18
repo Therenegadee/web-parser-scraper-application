@@ -1,30 +1,35 @@
 package parser.app.webscraper.mappers.jdbc;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import parser.app.webscraper.dao.jdbc.interfaces.ElementLocatorDao;
 import parser.app.webscraper.dao.jdbc.interfaces.FolderDao;
 import parser.app.webscraper.dao.jdbc.interfaces.ParserResultDao;
 import parser.app.webscraper.exceptions.NotFoundException;
-import parser.app.webscraper.models.ElementLocator;
-import parser.app.webscraper.models.Folder;
-import parser.app.webscraper.models.ParserResult;
-import parser.app.webscraper.models.UserParserSetting;
+import parser.app.webscraper.models.*;
 
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
 public class UserParserSettingRowMapper implements RowMapper<UserParserSetting> {
 
-    private final FolderDao folderDao;
-    private final ParserResultDao parserResultDao;
-    private final ElementLocatorDao elementLocatorDao;
+    @Autowired
+    private ParserResultDao parserResultDao;
+    @Autowired
+    private ElementLocatorDao elementLocatorDao;
+    private Map<Long, Folder> folderMap;
+    private List<StorageItem> storageItems;
+    private Storage storage;
 
     @Override
     public UserParserSetting mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -47,12 +52,22 @@ public class UserParserSettingRowMapper implements RowMapper<UserParserSetting> 
                 .cssSelectorNextPage(rs.getString("css_selector_next_page"))
                 .header(header)
                 .elementLocators(getElementLocatorsById(id))
-                .parentFolder(getParentFolderByParentFolderId(rs.getLong("parent_folder_id")))
                 .parsingHistory(getParsingHistoryById(id))
                 .build();
 
         userParserSetting.setName(rs.getString("name"));
         userParserSetting.setTags(tags);
+
+        if (Objects.nonNull(folderMap) && Objects.nonNull(storageItems) && Objects.nonNull(storage)) {
+            long parentFolderId = rs.getLong("parent_folder_id");
+            if (parentFolderId == 0) {
+                userParserSetting.setParentFolder(null);
+                storageItems.add(userParserSetting);
+            } else {
+                userParserSetting.setParentFolder(folderMap.get(parentFolderId));
+            }
+            userParserSetting.setStorage(storage);
+        }
         return userParserSetting;
     }
 
@@ -67,12 +82,6 @@ public class UserParserSettingRowMapper implements RowMapper<UserParserSetting> 
         return outputList;
     }
 
-    private Folder getParentFolderByParentFolderId(Long parentFolderId) {
-        return folderDao
-                .findByFolderId(parentFolderId)
-                .orElseThrow(() -> new NotFoundException(String.format("Parent Folder with id %d Wasn't Found", parentFolderId)));
-    }
-
     private List<ParserResult> getParsingHistoryById(Long id) {
         return parserResultDao
                 .findAllByParserSettingsId(id);
@@ -81,5 +90,13 @@ public class UserParserSettingRowMapper implements RowMapper<UserParserSetting> 
     private List<ElementLocator> getElementLocatorsById(Long id) {
         return elementLocatorDao
                 .findAllByParserSettingsId(id);
+    }
+
+    public UserParserSettingRowMapper(Map<Long, Folder> folderMap,
+                                      List<StorageItem> storageItems,
+                                      Storage storage) {
+        this.folderMap = folderMap;
+        this.storageItems = storageItems;
+        this.storage = storage;
     }
 }
