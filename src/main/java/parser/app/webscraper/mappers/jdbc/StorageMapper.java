@@ -21,7 +21,8 @@ public class StorageMapper implements ResultSetExtractor<Storage> {
     private static final String SQL_TO_SETTINGS = """
             SELECT *
             FROM user_parser_settings
-            WHERE parent_folder_id IS NULL OR id BETWEEN ? AND ?;
+            WHERE parent_folder_id IS NULL OR id BETWEEN ? AND ?
+            ORDER BY parent_folder_id NULLS FIRST, id;
             """;
 
     @Override

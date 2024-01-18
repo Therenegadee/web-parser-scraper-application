@@ -27,7 +27,7 @@ public class StorageJdbcTemplate implements StorageDao {
                      UNION ALL
                     \s
                      SELECT subf.* FROM folder subf
-                     JOIN folder f ON subf.parent_folder_id = f.id
+                     JOIN storage_folder sf ON subf.parent_folder_id = sf.id
                 )
                 SELECT sf.*, st.user_id FROM storage_folder sf
                 JOIN storage st on st.id = sf.storage_id

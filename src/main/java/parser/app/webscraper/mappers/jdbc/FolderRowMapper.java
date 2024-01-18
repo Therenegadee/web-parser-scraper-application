@@ -28,7 +28,6 @@ public class FolderRowMapper implements RowMapper<Folder> {
         Folder folder = Folder.builder()
                 .id(id)
                 .parentFolder(findParentFolder(rs.getLong("parent_folder_id")).orElse(null))
-                .userId(rs.getLong("user_id"))
                 .storageItems(storageItems)
                 .build();
         folder.setName(rs.getString("name"));
@@ -48,25 +47,5 @@ public class FolderRowMapper implements RowMapper<Folder> {
         return outputList;
     }
 
-    private Optional<Folder> findParentFolder(Long parentFolderId) {
-        return folderDao.findByFolderId(parentFolderId);
-
-    }
-
-    private List<StorageItem> findItems(Long folderId) {
-        List<StorageItem> outputList = new ArrayList<>();
-        List<Folder> subfolders = folderDao.findAllByParentFolderId(folderId);
-        List<UserParserSetting> parserSettings = userParserSettingsDao.findAllByParentFolderId(folderId);
-        if (Objects.nonNull(parserSettings)) {
-            outputList.addAll(parserSettings);
-        }
-        if(Objects.nonNull(subfolders)) {
-            for (Folder folder : subfolders) {
-                folder.setStorageItems(findItems(folder.getId()));
-            }
-            outputList.addAll(subfolders);
-        }
-        return outputList;
-    }
 
 }

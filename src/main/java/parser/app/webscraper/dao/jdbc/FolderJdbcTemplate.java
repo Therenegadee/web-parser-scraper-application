@@ -31,8 +31,19 @@ public class FolderJdbcTemplate implements FolderDao {
     @Transactional
     @Override
     public Optional<Folder> findByFolderId(Long id) {
-        String query = "SELECT * FROM folder f" +
-                "WHERE id=?";
+        String query = """
+                WITH RECURSIVE folders AS (
+                  SELECT * FROM folder f
+                  WHERE f.parent_folder_id = ?
+                 \s
+                  UNION ALL
+                 \s
+                  SELECT subf.* FROM folder subf
+                  JOIN folders fs ON subf.parent_folder_id = fs.id
+                 )
+                 SELECT * FROM folders fs
+                 ORDER BY fs.parent_folder_id NULLS FIRST, fs.id;
+                """;
         return jdbcTemplate
                 .query(query, folderMapper, id)
                 .stream()
@@ -42,8 +53,19 @@ public class FolderJdbcTemplate implements FolderDao {
     @Transactional
     @Override
     public List<Folder> findByFolderId(long minId, long maxId) {
-        String query = "SELECT * FROM folder f" +
-                "WHERE id BETWEEN ? AND ?";
+        String query = """
+                WITH RECURSIVE folders AS (
+                  SELECT * FROM folder f
+                  WHERE f.parent_folder_id between ? and ?
+                 \s
+                  UNION ALL
+                 \s
+                  SELECT subf.* FROM folder subf
+                  JOIN folders fs ON subf.parent_folder_id = fs.id
+                 )
+                 SELECT * FROM folders fs
+                 ORDER BY fs.parent_folder_id NULLS FIRST, fs.id;
+                """;
         return jdbcTemplate.query(query, folderMapper, minId, maxId);
     }
 
