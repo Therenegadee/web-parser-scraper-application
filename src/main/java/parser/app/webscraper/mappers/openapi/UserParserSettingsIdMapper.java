@@ -2,7 +2,7 @@ package parser.app.webscraper.mappers.openapi;
 
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import parser.app.webscraper.dao.interfaces.UserParserSettingsDao;
+import parser.app.webscraper.dao.jdbc.interfaces.UserParserSettingsDao;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.models.UserParserSetting;
 

@@ -1,13 +1,14 @@
-package parser.app.webscraper.dao.interfaces;
+package parser.app.webscraper.dao.jdbc.interfaces;
 
 import parser.app.webscraper.models.Folder;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public interface FolderDao {
     Optional<Folder> findByFolderId(Long id);
+
+    List<Folder> findByFolderId(long maxId, long minId);
 
     Folder save(Folder folder);
 

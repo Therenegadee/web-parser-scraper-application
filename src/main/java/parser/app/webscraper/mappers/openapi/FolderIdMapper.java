@@ -2,7 +2,7 @@ package parser.app.webscraper.mappers.openapi;
 
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import parser.app.webscraper.dao.interfaces.FolderDao;
+import parser.app.webscraper.dao.jdbc.interfaces.FolderDao;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.models.Folder;
 
