@@ -47,8 +47,7 @@ public class StorageServiceImpl implements StorageService {
     @Observed
     @Override
     public ResponseEntity<Void> createNewFolder(Long userId, FolderOpenApi folderOpenApi) {
-        Folder folder = folderMapper.toFolder(folderOpenApi);
-        folderDao.save(folder);
+        folderDao.save(folderOpenApi);
         return ResponseEntity
                 .status(201)
                 .build();
@@ -66,8 +65,7 @@ public class StorageServiceImpl implements StorageService {
     @Observed
     @Override
     public ResponseEntity<Void> updateFolderById(Long folderId, FolderOpenApi folderOpenApi) {
-        Folder folder = folderMapper.toFolder(folderOpenApi);
-        folderDao.updateById(folderId, folder);
+        folderDao.updateById(folderId, folderOpenApi);
         return ResponseEntity
                 .ok()
                 .build();

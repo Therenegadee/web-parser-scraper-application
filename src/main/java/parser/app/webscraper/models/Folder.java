@@ -13,9 +13,9 @@ public class Folder extends StorageItem {
     private Long id;
     private Storage storage;
     private Folder parentFolder;
-    private List<StorageItem> storageItems;
+    private List<StorageItem> folderItems;
 
-    public void addStorageItem(StorageItem storageItem) {
-        storageItems.add(storageItem);
+    public void addFolderItem(StorageItem storageItem) {
+        folderItems.add(storageItem);
     }
 }

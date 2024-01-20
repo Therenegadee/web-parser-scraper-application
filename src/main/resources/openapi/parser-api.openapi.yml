@@ -448,6 +448,9 @@ components:
             - parentFolderId
             - folderItems
           properties:
+            id:
+              type: integer
+              format: int64
             storageId:
               type: integer
               format: int64

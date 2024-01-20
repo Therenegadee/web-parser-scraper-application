@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS folder (
     tags                TEXT[],
     storage_id          BIGINT      NOT NULL,
     parent_folder_id    BIGINT,
-    FOREIGN KEY (parent_folder_id) REFERENCES folder(id)
+    FOREIGN KEY (storage_id) REFERENCES storage(id) ON DELETE CASCADE,
+    FOREIGN KEY (parent_folder_id) REFERENCES folder(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS user_parser_settings (
@@ -31,7 +32,8 @@ CREATE TABLE IF NOT EXISTS user_parser_settings (
     header                  TEXT[]      NOT NULL,
     storage_id              BIGINT      NOT NULL,
     parent_folder_id        BIGINT,
-    FOREIGN KEY (parent_folder_id) REFERENCES folder(id)
+    FOREIGN KEY (storage_id) REFERENCES storage(id) ON DELETE CASCADE,
+    FOREIGN KEY (parent_folder_id) REFERENCES folder(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS element_locator (
@@ -41,7 +43,7 @@ CREATE TABLE IF NOT EXISTS element_locator (
     path_to_locator             VARCHAR     NOT NULL,
     extra_pointer               VARCHAR,
     user_parser_settings_id     BIGINT,
-    FOREIGN KEY (user_parser_settings_id) REFERENCES user_parser_settings (id)
+    FOREIGN KEY (user_parser_settings_id) REFERENCES user_parser_settings (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS parser_results (
@@ -50,7 +52,7 @@ CREATE TABLE IF NOT EXISTS parser_results (
     link_to_download            VARCHAR,
     output_file_type            VARCHAR,
     user_parser_settings_id     BIGINT,
-    FOREIGN KEY (user_parser_settings_id) REFERENCES user_parser_settings (id)
+    FOREIGN KEY (user_parser_settings_id) REFERENCES user_parser_settings (id) ON DELETE CASCADE
 );
 
 end;

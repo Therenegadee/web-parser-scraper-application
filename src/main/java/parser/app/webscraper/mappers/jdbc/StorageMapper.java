@@ -21,9 +21,9 @@ public class StorageMapper implements ResultSetExtractor<Storage> {
     private static final String SQL_TO_SETTINGS = """
             SELECT *
             FROM user_parser_settings
-            WHERE parent_folder_id IS NULL OR id BETWEEN ? AND ?
+            WHERE storage_id = ? AND (parent_folder_id IS NULL OR parent_folder_id BETWEEN ? AND ?)
             ORDER BY parent_folder_id NULLS FIRST, id;
-            """;
+                        """;
 
     @Override
     public Storage extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -39,7 +39,8 @@ public class StorageMapper implements ResultSetExtractor<Storage> {
         List<StorageItem> storageItems = new ArrayList<>();
 
         Storage storage = new Storage();
-        storage.setId(rs.getLong("storage_id"));
+        Long storageId = rs.getLong("storage_id");
+        storage.setId(storageId);
         storage.setUserId(userId);
 
         while (!rs.isAfterLast()) {
@@ -60,15 +61,17 @@ public class StorageMapper implements ResultSetExtractor<Storage> {
                 storageItems.add(folder);
             } else {
                 folder.setParentFolder(folderMap.get(parentFolderId));
-                folderMap.get(parentFolderId).addStorageItem(folder);
+                folderMap.get(parentFolderId).addFolderItem(folder);
             }
 
             folderMap.put(parentFolderId, folder);
+            rs.next();
         }
 
         jdbcTemplate.query(
                 SQL_TO_SETTINGS,
                 new UserParserSettingRowMapper(folderMap, storageItems, storage),
+                storageId,
                 minId,
                 maxId);
 
