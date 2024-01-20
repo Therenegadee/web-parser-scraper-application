@@ -105,6 +105,7 @@ public class UserParserSettingsMapper implements ResultSetExtractor<List<UserPar
                 String.join(", ", Collections.nCopies(settingsIds.size(), "?")) +
                 ")" +
                 "ORDER BY user_parser_settings_id, id";
+
         return jdbcTemplate.query(query, parserResultMapper, settingsIds.toArray());
     }
 
