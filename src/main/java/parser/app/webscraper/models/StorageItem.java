@@ -8,7 +8,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StorageItem {
+public abstract class StorageItem {
     private String name;
     private List<String> tags;
 }

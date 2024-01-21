@@ -2,6 +2,8 @@ package parser.app.webscraper.models;
 
 
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -10,7 +12,9 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Component
 public class UserParserSetting extends StorageItem {
+    @Id
     private Long id;
     private String firstPageUrl;
     private int numOfPagesToParse;

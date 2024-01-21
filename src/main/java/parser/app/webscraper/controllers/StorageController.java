@@ -23,7 +23,7 @@ public class StorageController implements StorageApiDelegate {
     public ResponseEntity<StorageOpenApi> getStorageByUserId (
             @RequestParam(name = "userId") Long userId
     ) {
-        return ResponseEntity.ok(storageService.getStorageByUserId(userId));
+        return ResponseEntity.ok(storageService.findByUserId(userId));
     }
 
     @Observed

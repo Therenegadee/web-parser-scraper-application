@@ -1,6 +1,8 @@
 package parser.app.webscraper.models;
 
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -9,7 +11,9 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Component
 public class Folder extends StorageItem {
+    @Id
     private Long id;
     private Storage storage;
     private Folder parentFolder;

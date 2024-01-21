@@ -2,74 +2,49 @@ package parser.app.webscraper.services;
 
 import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import parser.app.webscraper.dao.jdbc.interfaces.FolderDao;
-import parser.app.webscraper.dao.jdbc.interfaces.StorageDao;
-import parser.app.webscraper.dao.jdbc.interfaces.UserParserSettingsDao;
 import parser.app.webscraper.exceptions.NotFoundException;
-import parser.app.webscraper.mappers.openapi.StorageItemMapper;
-import parser.app.webscraper.mappers.openapi.FolderMapper;
 import parser.app.webscraper.mappers.openapi.StorageMapper;
-import parser.app.webscraper.mappers.openapi.UserParserSettingsMapper;
-import parser.app.webscraper.models.Folder;
 import parser.app.webscraper.models.Storage;
+import parser.app.webscraper.repository.StorageRepository;
 import parser.app.webscraper.services.interfaces.StorageService;
-import parser.userService.openapi.model.FolderOpenApi;
 import parser.userService.openapi.model.StorageOpenApi;
 
 @Service
 @RequiredArgsConstructor
 public class StorageServiceImpl implements StorageService {
-    private final FolderDao folderDao;
-    private final StorageDao storageDao;
-    private final UserParserSettingsDao userParserSettingsDao;
-    private final StorageItemMapper storageItemMapper;
+    private final StorageRepository storageRepository;
     private final StorageMapper storageMapper;
-    private final FolderMapper folderMapper;
-    private final UserParserSettingsMapper userParserSettingsMapper;
 
     @Observed
     @Override
-    public StorageOpenApi getStorageByUserId(Long userId) {
-        Storage storage = storageDao.findByUserId(userId);
+    public StorageOpenApi findByStorageId(Long storageId) {
+        Storage storage = storageRepository
+                .findById(storageId)
+                .orElseThrow(() -> new NotFoundException(String.format("Storage with id %d wasn't found", storageId)));
         return storageMapper.toOpenApi(storage);
     }
 
     @Observed
     @Override
-    public FolderOpenApi getFolderByFolderId(Long folderId) {
-        return folderMapper
-                .toOpenApi(folderDao.findByFolderId(folderId)
-                        .orElseThrow(() -> new NotFoundException(String.format("Folder with idd %d wasn't found", folderId))));
+    public StorageOpenApi findByUserId(Long userId) {
+        Storage storage = storageRepository
+                .findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("Storage with user id %d wasn't found", userId)));
+        return storageMapper.toOpenApi(storage);
     }
 
     @Observed
     @Override
-    public ResponseEntity<Void> createNewFolder(Long userId, FolderOpenApi folderOpenApi) {
-        Folder folder = folderMapper.toFolder(folderOpenApi);
-        folderDao.save(folder);
-        return ResponseEntity
-                .status(201)
-                .build();
+    public void updateStorageById(Long storageId, StorageOpenApi storageOpenApi) {
+        Storage storage = storageMapper.toStorage(storageOpenApi);
+        storageRepository.updateByStorageId(storageId, storage);
     }
 
     @Observed
     @Override
-    public ResponseEntity<Void> deleteFolderById(Long folderId) {
-        folderDao.deleteById(folderId);
-        return ResponseEntity
-                .status(204)
-                .build();
-    }
-
-    @Observed
-    @Override
-    public ResponseEntity<Void> updateFolderById(Long folderId, FolderOpenApi folderOpenApi) {
-        Folder folder = folderMapper.toFolder(folderOpenApi);
-        folderDao.updateById(folderId, folder);
-        return ResponseEntity
-                .ok()
-                .build();
+    public void updateStorageByUserId(Long userId, StorageOpenApi storageOpenApi) {
+        Storage storage = storageMapper.toStorage(storageOpenApi);
+        storageRepository.updateByUserId(userId, storage);
     }
 }
