@@ -1,4 +1,4 @@
-package parser.userService.handler;
+package parser.app.webscraper.handler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

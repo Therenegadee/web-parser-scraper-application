@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import parser.app.webscraper.models.ParserResult;
 import parser.app.webscraper.services.interfaces.ParserService;
 import parser.userService.openapi.api.ParserApiDelegate;
 import parser.userService.openapi.model.ParserResultOpenApi;

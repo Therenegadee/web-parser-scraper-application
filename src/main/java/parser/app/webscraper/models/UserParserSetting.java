@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -15,7 +16,7 @@ import java.util.List;
 @Component
 public class UserParserSetting extends StorageItem {
     @Id
-    private Long id;
+    private UUID id;
     private String firstPageUrl;
     private int numOfPagesToParse;
     private String className; // класс, содержащий в себе ссылкий на страницы
@@ -24,6 +25,6 @@ public class UserParserSetting extends StorageItem {
     private List<String> header;
     private List<ElementLocator> elementLocators;
     private List<ParserResult> parsingHistory;
-    private Folder parentFolder;
-    private Storage storage;
+    private UUID parentFolderId;
+    private UUID storageId;
 }

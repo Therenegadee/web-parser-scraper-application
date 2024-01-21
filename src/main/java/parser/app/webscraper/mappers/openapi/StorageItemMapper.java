@@ -8,11 +8,11 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {FolderMapper.class, UserParserSettingsMapper.class})
 public interface StorageItemMapper {
-    StorageItem toStorageItem(StorageItemOpenApi folderItemOpenApi);
-
-    List<StorageItem> toStorageItem(List<StorageItemOpenApi> folderItemOpenApi);
-
-    StorageItemOpenApi toOpenApi(StorageItem storageItem);
-
-    List<StorageItemOpenApi> toOpenApi(List<StorageItem> storageItem);
+//    StorageItem toStorageItem(StorageItemOpenApi folderItemOpenApi);
+//
+//    List<StorageItem> toStorageItem(List<StorageItemOpenApi> folderItemOpenApi);
+//
+//    StorageItemOpenApi toOpenApi(StorageItem storageItem);
+//
+//    List<StorageItemOpenApi> toOpenApi(List<StorageItem> storageItem);
 }

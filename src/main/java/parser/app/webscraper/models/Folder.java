@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -14,9 +15,9 @@ import java.util.List;
 @Component
 public class Folder extends StorageItem {
     @Id
-    private Long id;
-    private Storage storage;
-    private Folder parentFolder;
+    private UUID id;
+    private UUID storageIdd;
+    private UUID parentFolderId;
     private List<StorageItem> storageItems;
 
     public void addStorageItem(StorageItem storageItem) {

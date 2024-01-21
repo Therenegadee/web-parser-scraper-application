@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 
 @Document
 @Setter
@@ -14,7 +15,7 @@ import java.util.List;
 @Component
 public class Storage {
     @Id
-    private Long id;
+    private UUID id;
     private Long userId;
     private List<StorageItem> storageItems;
 }

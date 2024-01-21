@@ -183,7 +183,7 @@ paths:
         - bearerAuth: [ ]
       tags:
         - storage
-      summary: Retrieving All Storage Items of User with Concrete Id
+      summary: Retrieving The Whole Storage With Items of User with Concrete Id
       parameters:
         - name: userId
           in: query
@@ -204,40 +204,93 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         500:
           description: Internal Server Error
-
-  /storage/folder/new:
-    post:
+    put:
       security:
         - bearerAuth: [ ]
       tags:
-        - Storage
-      summary: Creating New Folder
-      operationId: createFolder
+        - storage
+      summary: Update The Storage With Items of User with Concrete Id
       parameters:
         - name: userId
           in: query
+          description: User id
           required: true
           schema:
             type: integer
             format: int64
-          description: The ID of the user who wants to create folder
+      operationId: updateStorageByUserId
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/FolderOpenApi"
+              $ref: "#/components/schemas/StorageOpenApi"
       responses:
-        '201':
-          description: The folder was created successfully
+        200:
+          description: The Storage was retrieved successfully
         401:
           $ref: "#/components/responses/UnauthorizedError"
-        '404':
-          description: Folder not found
-        '500':
+        500:
           description: Internal Server Error
 
-  /storage/folder/{folderId}:
+
+  /storage/{storageId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - storage
+      summary: Retrieving The Whole Storage With Items of Storage by its Id
+      parameters:
+        - name: storageId
+          in: path
+          description: Storage id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      operationId: getStorageById
+      responses:
+        200:
+          description: The Storage was updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StorageOpenApi"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        500:
+          description: Internal Server Error
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - storage
+      summary: Update The Storage With Items By its Id
+      parameters:
+        - name: storageId
+          in: path
+          description: Storage id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      operationId: updateStorageById
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StorageOpenApi"
+      responses:
+        200:
+          description: The Storage was updated successfully
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        500:
+          description: Internal Server Error
+
+  /storage/{storageId}/folder/{folderId}:
     get:
       security:
         - bearerAuth: [ ]
@@ -246,12 +299,19 @@ paths:
       summary: Get Folder by Folder ID
       operationId: getFolderByFolderId
       parameters:
+        - name: storageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of Storage to retrieve
         - name: folderId
           in: path
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           description: The ID of the folder to retrieve
       responses:
         '200':
@@ -275,12 +335,19 @@ paths:
       summary: Update a folder by folder ID
       operationId: updateFolderById
       parameters:
+        - name: storageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of Storage to update
         - name: folderId
           in: path
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           description: The ID of the folder to update
       requestBody:
         required: true
@@ -306,12 +373,19 @@ paths:
       summary: Delete a folder by folder ID
       operationId: deleteFolderById
       parameters:
+        - name: storageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of Storage to delete
         - name: folderId
           in: path
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           description: The ID of the folder to delete
       responses:
         '200':
@@ -353,11 +427,11 @@ components:
             - parsingHistory
           properties:
             id:
-              type: integer
-              format: int64
+              type: string
+              format: uuid
             storageId:
-              type: integer
-              format: int64
+              type: string
+              format: uuid
             name:
               type: string
             tags:
@@ -388,8 +462,8 @@ components:
               items:
                 $ref: '#/components/schemas/ParserResultOpenApi'
             parentFolderId:
-              type: integer
-              format: int64
+              type: string
+              format: uuid
 
 
     ParserResultOpenApi:
@@ -412,8 +486,8 @@ components:
           type: object
           $ref: "#/components/schemas/OutputFileTypeOpenApi"
         userParserSettingsId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
 
     ElementLocatorOpenApi:
       type: object
@@ -436,8 +510,8 @@ components:
         extraPointer:
           type: string
         userParserSettingsId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
 
     FolderOpenApi:
       allOf:
@@ -448,12 +522,15 @@ components:
             - parentFolderId
             - folderItems
           properties:
+            id:
+              type: string
+              format: uuid
             storageId:
-              type: integer
-              format: int64
+              type: string
+              format: uuid
             parentFolderId:
-              type: integer
-              format: int64
+              type: string
+              format: uuid
             folderItems:
               type: array
               items:
@@ -461,7 +538,14 @@ components:
 
     StorageOpenApi:
       type: object
+      required:
+        - id
+        - userId
+        - storageItems
       properties:
+        id:
+          type: string
+          format: uuid
         userId:
           type: integer
           format: int64
