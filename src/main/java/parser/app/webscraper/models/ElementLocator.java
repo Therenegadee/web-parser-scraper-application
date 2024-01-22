@@ -9,6 +9,8 @@ import parser.app.webscraper.scraperlogic.logic.element.CssSelectorElement;
 import parser.app.webscraper.scraperlogic.logic.element.TagAttrElement;
 import parser.app.webscraper.scraperlogic.logic.element.XPathElement;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,5 +29,5 @@ public class ElementLocator {
     private ElementType type;
     private String pathToLocator;
     private String extraPointer; // for Tag + Attribute
-    private UserParserSetting userParserSetting;
+    private UUID userParserSettingsId;
 }

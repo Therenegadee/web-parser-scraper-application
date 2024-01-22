@@ -7,16 +7,9 @@ server:
 spring:
   application:
     name: scrapper-service
-#  sql:
-#    init:
-#      mode: always
-#  datasource:
-#    username: scrapper_service
-#    password: scrapper_service
-#    url: jdbc:postgresql://db-parser:5432/scrapper_service
     data:
       mongodb:
-        host: localhost
+        host: db-mongo
         port: 27017
         database: scrapper_service
 

@@ -1,8 +1,6 @@
 package parser.app.webscraper.services.interfaces;
 
 import org.springframework.http.ResponseEntity;
-import parser.app.webscraper.models.Folder;
-import parser.app.webscraper.models.UserParserSetting;
 import parser.userService.openapi.model.FolderOpenApi;
 import parser.userService.openapi.model.StorageOpenApi;
 import parser.userService.openapi.model.UserParserSettingsOpenApi;
