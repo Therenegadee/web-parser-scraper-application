@@ -19,11 +19,8 @@ public interface StorageService {
 
     FolderOpenApi findFolderById(UUID storageId, UUID folderId);
 
-    UserParserSettingsOpenApi findParserSettingsById(UUID storageId, UUID settingsId);
-
     ResponseEntity<Void> updateFolderById(UUID storageId, UUID storageItemId, FolderOpenApi folderOpenApi);
 
-    ResponseEntity<Void> updateSettingsById(UUID storageId, UUID storageItemId, UserParserSettingsOpenApi userParserSettingsOpenApi);
+    ResponseEntity<Void> deleteFolderById(UUID storageId, UUID folderId);
 
-    ResponseEntity<Void> deleteStorageItemById(UUID storageId, UUID storageItemId);
 }

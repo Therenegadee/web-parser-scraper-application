@@ -27,4 +27,8 @@ public class UserParserSetting extends StorageItem {
     private List<ParserResult> parsingHistory;
     private UUID parentFolderId;
     private UUID storageId;
+
+    public void addParserResult(ParserResult parserResult) {
+        parsingHistory.add(parserResult);
+    }
 }

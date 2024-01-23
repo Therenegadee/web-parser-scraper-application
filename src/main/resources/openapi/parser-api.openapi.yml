@@ -8,34 +8,6 @@ servers:
 
 paths:
   /parser/preset:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Parser
-      parameters:
-        - name: userId
-          in: query
-          description: User id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      summary: Get All Parser Settings Presets by User Id
-      operationId: getParserSettingsByUserId
-      responses:
-        '201':
-          description: All Users Parser Settings Presets was Retrieved Successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/UserParserSettingsOpenApi"
-        '401':
-          $ref: "#/components/responses/UnauthorizedError"
-        '500':
-          description: Internal Server Error
     post:
       security:
         - bearerAuth: [ ]
@@ -49,6 +21,12 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: folderName
+          in: query
+          description: Folder Name
+          required: false
+          schema:
+            type: string
       summary: Create Parser Settings Preset
       operationId: createParserSettings
       requestBody:
@@ -78,8 +56,15 @@ paths:
           description: Preset id
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
+        - name: storageId
+          in: query
+          description: Storage id
+          required: true
+          schema:
+            type: string
+            format: uuid
       summary: Get Parser Settings Preset by Id
       operationId: getParserSettingsById
       responses:
@@ -104,8 +89,15 @@ paths:
           description: Preset id
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
+        - name: storageId
+          in: query
+          description: Storage id
+          required: true
+          schema:
+            type: string
+            format: uuid
       summary: Delete Parser Settings Preset by Id
       operationId: deleteParserSettingsById
       responses:
@@ -126,8 +118,15 @@ paths:
           description: Preset id
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: UUID
+        - name: storageId
+          in: query
+          description: Storage id
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -158,10 +157,24 @@ paths:
           name: presetId
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
             minimum: 1
           description: Parser Preset ID
+        - name: storageId
+          in: query
+          description: Storage id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: resultId
+          in: query
+          description: Parsing History Element id
+          required: true
+          schema:
+            type: integer
+            format: int64
       operationId: downloadFile
       responses:
         200:

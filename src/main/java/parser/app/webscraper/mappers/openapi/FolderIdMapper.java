@@ -19,7 +19,7 @@ public class FolderIdMapper {
         if (id == null) {
             return null;
         }
-        return (Folder) storageRepository.findStorageItemById(storageId, id)
+        return (Folder) storageRepository.findFolderById(storageId, id)
                 .orElseThrow(() -> new NotFoundException(String.format("Folder with id %d wasn't found", id)));
     }
 

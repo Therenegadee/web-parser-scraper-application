@@ -4,9 +4,13 @@ import io.micrometer.observation.annotation.Observed;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
+import parser.app.webscraper.exceptions.NotFoundException;
+import parser.app.webscraper.models.Folder;
 import parser.app.webscraper.models.Storage;
 import parser.app.webscraper.models.StorageItem;
+import parser.app.webscraper.models.UserParserSetting;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,13 +31,48 @@ public interface StorageRepository extends MongoRepository<Storage, UUID> {
     @Update("{'$set': {'storage': ?1}}")
     void updateByStorageId(UUID storageId, Storage storage);
 
-    @Query("{'id': ?0, 'storageItems.id': ?1}")
-    Optional<StorageItem> findStorageItemById(UUID storageId, UUID storageItemId);
+    @Observed
+    default Optional<UserParserSetting> findParserSettingsById(UUID storageId, UUID settingsId) {
+        Storage storage = findById(storageId)
+                .orElseThrow(() -> new NotFoundException(String.format("Storage with id %s wasn't found", storageId)));
+        List<StorageItem> storageItems = storage.getStorageItems();
+        return findParserSettingsById(storageItems, settingsId);
+    }
 
-    @Query("{'id': ?0, 'storageItems.id': ?1}")
-    @Update("{'$set': {'storageItems.$': ?2}}")
-    void updateStorageItemById(UUID storageId, UUID storageItemId, StorageItem storageItem);
+    @Observed
+    default Optional<UserParserSetting> findParserSettingsById(List<StorageItem> storageItems, UUID id) {
+        for (StorageItem item : storageItems) {
+            if (item instanceof UserParserSetting && ((UserParserSetting) item).getId().equals(id)) {
+                return Optional.of((UserParserSetting) item);
+            } else if (item instanceof Folder) {
+                Optional<UserParserSetting> result = findParserSettingsById(((Folder) item).getStorageItems(), id);
+                if (result.isPresent()) {
+                    return result;
+                }
+            }
+        }
+        return Optional.empty();
+    }
 
-    @Query("{'id': ?0, 'storageItems.id': ?1}")
-    void deleteStorageItemById(UUID storageId, UUID storageItemId);
+    default Optional<Folder> findFolderById(UUID storageId, UUID folderId) {
+        Storage storage = findById(storageId)
+                .orElseThrow(() -> new NotFoundException(String.format("Storage with id %s wasn't found", storageId)));
+        List<StorageItem> storageItems = storage.getStorageItems();
+        return findFolderById(storageItems, folderId);
+    }
+
+    default Optional<Folder> findFolderById(List<StorageItem> storageItems, UUID folderId) {
+        for (StorageItem item : storageItems) {
+            if (item instanceof Folder) {
+                if (((Folder) item).getId().equals(folderId)) {
+                    return Optional.of((Folder) item);
+                }
+                Optional<Folder> result = findFolderById(((Folder) item).getStorageItems(), folderId);
+                if (result.isPresent()) {
+                    return result;
+                }
+            }
+        }
+        return Optional.empty();
+    }
 }

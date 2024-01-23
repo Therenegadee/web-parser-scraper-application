@@ -79,7 +79,7 @@ public class StorageController implements StorageApiDelegate {
             @PathVariable(name = "storageId") @Valid UUID storageId,
             @PathVariable(name = "folderId") @Valid UUID folderId
     ) {
-        return storageService.deleteStorageItemById(storageId, folderId);
+        return storageService.deleteFolderById(storageId, folderId);
     }
 
 }

@@ -18,7 +18,7 @@ public class UserParserSettingsIdMapper {
         if (id == null) {
             return null;
         }
-        return (UserParserSetting) storageRepository.findStorageItemById(storageId, id)
+        return (UserParserSetting) storageRepository.findParserSettingsById(storageId, id)
                 .orElseThrow(() -> new NotFoundException(String.format("UserParserSetting with id %d wasn't found", id)));
     }
 

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import parser.app.webscraper.scraperlogic.logic.outputFile.OutputFileType;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -19,5 +20,5 @@ public class ParserResult {
     private Date date;
     private String linkToDownloadResults;
     private OutputFileType outputFileType;
-    private UserParserSetting userParserSetting;
+    private UUID userParserSettingId;
 }

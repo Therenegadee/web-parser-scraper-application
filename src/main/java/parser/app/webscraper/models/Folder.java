@@ -16,7 +16,7 @@ import java.util.UUID;
 public class Folder extends StorageItem {
     @Id
     private UUID id;
-    private UUID storageIdd;
+    private UUID storageId;
     private UUID parentFolderId;
     private List<StorageItem> storageItems;
 

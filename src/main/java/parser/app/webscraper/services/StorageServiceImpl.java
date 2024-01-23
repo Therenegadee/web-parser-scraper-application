@@ -10,13 +10,14 @@ import parser.app.webscraper.mappers.openapi.StorageMapper;
 import parser.app.webscraper.mappers.openapi.UserParserSettingsMapper;
 import parser.app.webscraper.models.Folder;
 import parser.app.webscraper.models.Storage;
-import parser.app.webscraper.models.UserParserSetting;
+import parser.app.webscraper.models.StorageItem;
 import parser.app.webscraper.repository.StorageRepository;
 import parser.app.webscraper.services.interfaces.StorageService;
 import parser.userService.openapi.model.FolderOpenApi;
 import parser.userService.openapi.model.StorageOpenApi;
-import parser.userService.openapi.model.UserParserSettingsOpenApi;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -25,14 +26,13 @@ public class StorageServiceImpl implements StorageService {
     private final StorageRepository storageRepository;
     private final StorageMapper storageMapper;
     private final FolderMapper folderMapper;
-    private final UserParserSettingsMapper userParserSettingsMapper;
 
     @Observed
     @Override
     public StorageOpenApi findByStorageId(UUID storageId) {
         Storage storage = storageRepository
                 .findById(storageId)
-                .orElseThrow(() -> new NotFoundException(String.format("Storage with id %d wasn't found", storageId)));
+                .orElseThrow(() -> new NotFoundException(String.format("Storage with id %s wasn't found", storageId)));
         return storageMapper.toOpenApi(storage);
     }
 
@@ -41,7 +41,7 @@ public class StorageServiceImpl implements StorageService {
     public StorageOpenApi findByUserId(Long userId) {
         Storage storage = storageRepository
                 .findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException(String.format("Storage with user id %d wasn't found", userId)));
+                .orElseThrow(() -> new NotFoundException(String.format("Storage with user id %s wasn't found", userId)));
         return storageMapper.toOpenApi(storage);
     }
 
@@ -69,19 +69,9 @@ public class StorageServiceImpl implements StorageService {
     @Override
     public FolderOpenApi findFolderById(UUID storageId, UUID folderId) {
         return folderMapper.toOpenApi(
-                (Folder) storageRepository
-                        .findStorageItemById(storageId, folderId)
-                        .orElseThrow(() -> new NotFoundException(String.format("Folder with id %d in storage (id: %d) wasn't found", folderId, storageId)))
-        );
-    }
-
-    @Observed
-    @Override
-    public UserParserSettingsOpenApi findParserSettingsById(UUID storageId, UUID settingsId) {
-        return userParserSettingsMapper.toOpenApi(
-                (UserParserSetting) storageRepository
-                        .findStorageItemById(storageId, settingsId)
-                        .orElseThrow(() -> new NotFoundException(String.format("UserParserSetting with id %d in Storage (id: %d) wasn't found", settingsId, storageId)))
+                storageRepository
+                        .findFolderById(storageId, folderId)
+                        .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", folderId, storageId)))
         );
     }
 
@@ -92,8 +82,37 @@ public class StorageServiceImpl implements StorageService {
             UUID storageItemId,
             FolderOpenApi folderOpenApi
     ) {
-        Folder folder = folderMapper.toFolder(folderOpenApi);
-        storageRepository.updateStorageItemById(storageId, storageItemId, folder);
+        Folder sourceFolder = folderMapper.toFolder(folderOpenApi);
+        Storage storage = storageRepository
+                .findById(storageId)
+                .orElseThrow(() -> new NotFoundException(String.format("Storage with id %s wasn't found", storageId)));
+        List<StorageItem> storageItems = storage.getStorageItems();
+
+        Folder targetFolder = storageRepository
+                .findFolderById(storageItems, storageItemId)
+                .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", storageItemId, storageId)));
+
+        if (!targetFolder.getParentFolderId().equals(sourceFolder.getParentFolderId())) {
+            Folder targetParentFolder = storageRepository
+                    .findFolderById(storageItems, targetFolder.getParentFolderId())
+                    .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", storageItemId, storageId)));
+            targetParentFolder.getStorageItems().remove(targetFolder);
+            if (Objects.isNull(sourceFolder.getParentFolderId())) {
+                storageItems.add(targetFolder);
+            } else {
+                Folder sourceParentFolder = storageRepository
+                        .findFolderById(storageItems, sourceFolder.getParentFolderId())
+                        .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", storageItemId, storageId)));
+                sourceParentFolder.getStorageItems().add(targetFolder);
+            }
+        }
+
+        targetFolder.setName(sourceFolder.getName());
+        targetFolder.setStorageItems(sourceFolder.getStorageItems());
+        targetFolder.setTags(sourceFolder.getTags());
+        targetFolder.setParentFolderId(sourceFolder.getParentFolderId());
+        storageRepository.updateByStorageId(storageId, storage);
+
         return ResponseEntity
                 .ok()
                 .build();
@@ -101,24 +120,29 @@ public class StorageServiceImpl implements StorageService {
 
     @Observed
     @Override
-    public ResponseEntity<Void> updateSettingsById(
-            UUID storageId,
-            UUID storageItemId,
-            UserParserSettingsOpenApi userParserSettingsOpenApi
-    ) {
-        UserParserSetting userParserSetting = userParserSettingsMapper.toUserParseSetting(userParserSettingsOpenApi);
-        storageRepository.updateStorageItemById(storageId, storageItemId, userParserSetting);
-        return ResponseEntity
-                .ok()
-                .build();
-    }
+    public ResponseEntity<Void> deleteFolderById(UUID storageId, UUID folderId) {
+        Storage storage = storageRepository
+                .findById(storageId)
+                .orElseThrow(() -> new NotFoundException(String.format("Storage with id %s wasn't found", storageId)));
+        List<StorageItem> storageItems = storage.getStorageItems();
 
-    @Observed
-    @Override
-    public ResponseEntity<Void> deleteStorageItemById(UUID storageId, UUID storageItemId) {
-        storageRepository.deleteStorageItemById(storageId, storageItemId);
+        Folder folder = storageRepository
+                .findFolderById(storageItems, folderId)
+                .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", folderId, storageId)));
+        Folder parentFolder = storageRepository
+                .findFolderById(storageItems, folder.getParentFolderId())
+                .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", folder.getParentFolderId(), storageId)));
+
+        List<StorageItem> folderItems = folder.getStorageItems();
+        parentFolder.getStorageItems().remove(folder);
+        storage.addStorageItems(folderItems);
+
+        storageRepository.updateByStorageId(storageId, storage);
+
         return ResponseEntity
                 .status(204)
                 .build();
     }
+
+
 }
