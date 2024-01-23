@@ -1,4 +1,4 @@
-package parser.parser.app.webscraper;
+package parser.app.webscraper;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

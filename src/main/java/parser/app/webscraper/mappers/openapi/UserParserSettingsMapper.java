@@ -13,16 +13,16 @@ import java.util.List;
 )
 public interface UserParserSettingsMapper {
 
-    @Mapping(source = "parentFolderId", target = "parentFolder")
+    @Mapping(source = "parentFolderId", target = "parentFolderId")
     UserParserSetting toUserParseSetting(UserParserSettingsOpenApi userParserSettingsOpenApi);
 
-    @Mapping(source = "parentFolderId", target = "parentFolder")
+    @Mapping(source = "parentFolderId", target = "parentFolderId")
     List<UserParserSetting> toUserParseSetting(List<UserParserSettingsOpenApi> userParserSettingsOpenApi);
 
-    @Mapping(source = "parentFolder", target = "parentFolderId")
+    @Mapping(source = "parentFolderId", target = "parentFolderId")
     UserParserSettingsOpenApi toOpenApi(UserParserSetting userParserSetting);
 
-    @Mapping(source = "parentFolder", target = "parentFolderId")
+    @Mapping(source = "parentFolderId", target = "parentFolderId")
     List<UserParserSettingsOpenApi> toOpenApi(List<UserParserSetting> userParserSettingsOpenApi);
 
 }

@@ -2,23 +2,27 @@ package parser.app.webscraper.services.interfaces;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
-import parser.app.webscraper.models.ParserResult;
 import parser.userService.openapi.model.ParserResultOpenApi;
 import parser.userService.openapi.model.UserParserSettingsOpenApi;
 
 import java.util.List;
-import java.util.Set;
+import java.util.UUID;
 
 public interface ParserService {
     ResponseEntity<Void> createParserSettings(Long userId, UserParserSettingsOpenApi userParserSettingsOpenApi);
 
-    UserParserSettingsOpenApi getParserSettingsById(Long id);
+    ResponseEntity<Void> createParserSettings(Long userId, String folderName, UserParserSettingsOpenApi userParserSettingsOpenApi);
+
+    UserParserSettingsOpenApi findParserSettingsById(UUID storageId, UUID settingsId);
+
+    ResponseEntity<Void> updateParserSettingsById(UUID storageId, UUID settingsId, UserParserSettingsOpenApi userParserSettingsOpenApi);
+
+    ResponseEntity<Void> deleteParserSettingsById(UUID storageId, UUID settingsId);
 
     List<UserParserSettingsOpenApi> getAllParserSettingsByUserId(Long userId);
 
-    ResponseEntity<Void> deleteParserSettingsById(Long id);
 
-    ResponseEntity<Void> runParser(Long id, ParserResultOpenApi parserResultOpenApi);
+    ResponseEntity<Void> runParser(UUID storageId, UUID settingsId, ParserResultOpenApi parserResultOpenApi);
 
-    ResponseEntity<Resource> downloadFile(Long id);
+    ResponseEntity<Resource> downloadFile(UUID storageId, UUID settingsId, Long parserResultId);
 }

@@ -6,13 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import parser.app.webscraper.models.ParserResult;
 import parser.app.webscraper.services.interfaces.ParserService;
 import parser.userService.openapi.api.ParserApiDelegate;
 import parser.userService.openapi.model.ParserResultOpenApi;
 import parser.userService.openapi.model.UserParserSettingsOpenApi;
 
-import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/parser")
@@ -22,64 +21,60 @@ public class ParserController implements ParserApiDelegate {
 
     @Observed
     @Override
-    @GetMapping("/preset")
-    //    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<List<UserParserSettingsOpenApi>> getParserSettingsByUserId(
-            @RequestParam(name = "userId") Long userId
-    ) {
-        return ResponseEntity.ok(parserService.getAllParserSettingsByUserId(userId));
-    }
-
-    @Observed
-    @Override
     @PostMapping("/preset")
-//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Void> createParserSettings(
             @RequestParam(name = "userId") Long userId,
-            @RequestBody UserParserSettingsOpenApi userParserSettingsOpenApi
+            @RequestBody UserParserSettingsOpenApi userParserSettingsOpenApi,
+            @RequestParam(name = "folderName", required = false) String folderName
     ) {
+        if(!folderName.isEmpty()) {
+            return parserService.createParserSettings(userId, folderName, userParserSettingsOpenApi);
+        }
         return parserService.createParserSettings(userId, userParserSettingsOpenApi);
     }
 
     @Observed
     @Override
-    @GetMapping("/preset/{id}")
-    //    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @GetMapping("/preset/{presetId}")
     public ResponseEntity<UserParserSettingsOpenApi> getParserSettingsById(
-            @PathVariable("id") @Valid Long id
+            @PathVariable("presetId") @Valid UUID id,
+            @RequestParam(name = "storageId") UUID storageId
     ) {
-        return ResponseEntity.ok(parserService.getParserSettingsById(id));
+        return ResponseEntity.ok(parserService.findParserSettingsById(storageId, id));
     }
 
     @Observed
     @Override
-    @DeleteMapping("/preset/{id}")
-    //    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @DeleteMapping("/preset/{presetId}")
     public ResponseEntity<Void> deleteParserSettingsById(
-            @PathVariable("id") @Valid Long id
+            @PathVariable("presetId") @Valid UUID id,
+            @RequestParam(name = "storageId") UUID storageId
     ) {
-        return parserService.deleteParserSettingsById(id);
+        return parserService.deleteParserSettingsById(storageId, id);
     }
 
     @Observed
     @Override
-    @PostMapping("/preset/{id}")
-//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PostMapping("/preset/{presetId}")
     public ResponseEntity<Void> runParser(
-            @PathVariable("id") @Valid Long id,
+            @PathVariable("presetId") @Valid UUID id,
+            @RequestParam("storageId") UUID storageId,
             @RequestBody ParserResultOpenApi parserResultOpenApi
     ) {
-        return parserService.runParser(id, parserResultOpenApi);
+        return parserService.runParser(storageId, id, parserResultOpenApi);
     }
 
     @Observed
     @Override
-    @GetMapping("/preset/{id}/download")
-//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @GetMapping("/preset/{presetId}/download")
     public ResponseEntity<Resource> downloadFile(
-            @PathVariable("id") @Valid Long id
+            @PathVariable("presetId") @Valid UUID settingsId,
+            @RequestParam("storageId") @Valid UUID storageId,
+            @RequestParam("resultId") @Valid Long resultId
     ) {
-        return parserService.downloadFile(id);
+        return parserService.downloadFile(storageId, settingsId, resultId);
     }
+
+
 }
 

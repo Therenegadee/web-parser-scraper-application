@@ -2,19 +2,25 @@ package parser.app.webscraper.services.interfaces;
 
 import org.springframework.http.ResponseEntity;
 import parser.userService.openapi.model.FolderOpenApi;
-import parser.userService.openapi.model.StorageItemOpenApi;
 import parser.userService.openapi.model.StorageOpenApi;
+import parser.userService.openapi.model.UserParserSettingsOpenApi;
 
-import java.util.List;
+import java.util.UUID;
 
 public interface StorageService {
-    StorageOpenApi getStorageByUserId(Long userId);
 
-    FolderOpenApi getFolderByFolderId(Long folderId);
+    StorageOpenApi findByStorageId(UUID storageId);
 
-    ResponseEntity<Void> createNewFolder(Long userId, FolderOpenApi folderOpenApi);
+    StorageOpenApi findByUserId(Long userId);
 
-    ResponseEntity<Void> deleteFolderById(Long folderId);
+    ResponseEntity<Void> updateStorageById(UUID storageId, StorageOpenApi storageOpenApi);
 
-    ResponseEntity<Void> updateFolderById(Long folderId, FolderOpenApi folderOpenApi);
+    ResponseEntity<Void> updateStorageByUserId(Long userId, StorageOpenApi storageOpenApi);
+
+    FolderOpenApi findFolderById(UUID storageId, UUID folderId);
+
+    ResponseEntity<Void> updateFolderById(UUID storageId, UUID storageItemId, FolderOpenApi folderOpenApi);
+
+    ResponseEntity<Void> deleteFolderById(UUID storageId, UUID folderId);
+
 }
