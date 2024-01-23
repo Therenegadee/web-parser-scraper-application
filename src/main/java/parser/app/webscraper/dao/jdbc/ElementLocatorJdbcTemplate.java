@@ -23,6 +23,7 @@ public class ElementLocatorJdbcTemplate implements ElementLocatorDao {
     private final JdbcTemplate jdbcTemplate;
     private final ElementLocatorRowMapper elementMapper;
 
+
     @Transactional
     @Override
     public Optional<ElementLocator> findById(Long id) {
