@@ -7,10 +7,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
 import parser.app.webscraper.exceptions.NotFoundException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Document
+@Document("storages")
 @Setter
 @Getter
 @Component
@@ -19,6 +20,10 @@ public class Storage {
     private UUID id;
     private Long userId;
     private List<StorageItem> storageItems;
+
+    public Storage() {
+        this.storageItems = new ArrayList<>();
+    }
 
     public final void addStorageItem(StorageItem storageItem) {
         storageItems.add(storageItem);
@@ -35,5 +40,9 @@ public class Storage {
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException(String.format("Folder with name %s wasn't found", folderName)));
         folder.addStorageItem(storageItem);
+    }
+
+    public boolean isNew(){
+        return (getId() == null);
     }
 }

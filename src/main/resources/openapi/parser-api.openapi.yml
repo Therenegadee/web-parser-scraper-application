@@ -9,8 +9,6 @@ servers:
 paths:
   /parser/preset:
     post:
-      security:
-        - bearerAuth: [ ]
       tags:
         - Parser
       parameters:
@@ -21,12 +19,6 @@ paths:
           schema:
             type: integer
             format: int64
-        - name: folderName
-          in: query
-          description: Folder Name
-          required: false
-          schema:
-            type: string
       summary: Create Parser Settings Preset
       operationId: createParserSettings
       requestBody:
@@ -46,8 +38,6 @@ paths:
 
   /parser/preset/{presetId}:
     get:
-      security:
-        - bearerAuth: [ ]
       tags:
         - Parser
       parameters:
@@ -79,8 +69,6 @@ paths:
         '500':
           description: Internal Server Error
     delete:
-      security:
-        - bearerAuth: [ ]
       tags:
         - Parser
       parameters:
@@ -108,8 +96,6 @@ paths:
         '500':
           description: Internal Server Error
     post:
-      security:
-        - bearerAuth: [ ]
       tags:
         - Parser
       parameters:
@@ -147,8 +133,6 @@ paths:
 
   /parser/preset/{presetId}/download:
     get:
-      security:
-        - bearerAuth: [ ]
       summary: Download Results File by the Concrete Preset ID
       tags:
         - Parser
@@ -191,9 +175,27 @@ paths:
 
 
   /storage:
+    post:
+      tags:
+        - storage
+      summary: Create Storage For User With Id
+      parameters:
+        - name: userId
+          in: query
+          description: User id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      operationId: createStorage
+      responses:
+        200:
+          description: The Storage was created successfully
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        500:
+          description: Internal Server Error
     get:
-      security:
-        - bearerAuth: [ ]
       tags:
         - storage
       summary: Retrieving The Whole Storage With Items of User with Concrete Id
@@ -218,8 +220,6 @@ paths:
         500:
           description: Internal Server Error
     put:
-      security:
-        - bearerAuth: [ ]
       tags:
         - storage
       summary: Update The Storage With Items of User with Concrete Id
@@ -249,8 +249,6 @@ paths:
 
   /storage/{storageId}:
     get:
-      security:
-        - bearerAuth: [ ]
       tags:
         - storage
       summary: Retrieving The Whole Storage With Items of Storage by its Id
@@ -275,8 +273,6 @@ paths:
         500:
           description: Internal Server Error
     put:
-      security:
-        - bearerAuth: [ ]
       tags:
         - storage
       summary: Update The Storage With Items By its Id
@@ -303,10 +299,36 @@ paths:
         500:
           description: Internal Server Error
 
+  /storage/{storageId}/folder:
+    post:
+      tags:
+        - storage
+      summary: Create Folder in Storage with id
+      parameters:
+        - name: storageId
+          in: path
+          description: Storage id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      operationId: createFolder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FolderOpenApi'
+      responses:
+        201:
+          description: The Folder was created successfully
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        500:
+          description: Internal Server Error
+
   /storage/{storageId}/folder/{folderId}:
     get:
-      security:
-        - bearerAuth: [ ]
       tags:
         - Storage
       summary: Get Folder by Folder ID
@@ -341,8 +363,6 @@ paths:
           description: Internal Server Error
 
     put:
-      security:
-        - bearerAuth: [ ]
       tags:
         - Storage
       summary: Update a folder by folder ID
@@ -379,8 +399,6 @@ paths:
           description: Internal Server Error
 
     delete:
-      security:
-        - bearerAuth: [ ]
       tags:
         - Storage
       summary: Delete a folder by folder ID

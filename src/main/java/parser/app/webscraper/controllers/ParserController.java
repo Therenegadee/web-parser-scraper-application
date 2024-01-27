@@ -11,6 +11,7 @@ import parser.userService.openapi.api.ParserApiDelegate;
 import parser.userService.openapi.model.ParserResultOpenApi;
 import parser.userService.openapi.model.UserParserSettingsOpenApi;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -19,17 +20,15 @@ import java.util.UUID;
 public class ParserController implements ParserApiDelegate {
     private final ParserService parserService;
 
+
+
     @Observed
     @Override
     @PostMapping("/preset")
     public ResponseEntity<Void> createParserSettings(
             @RequestParam(name = "userId") Long userId,
-            @RequestBody UserParserSettingsOpenApi userParserSettingsOpenApi,
-            @RequestParam(name = "folderName", required = false) String folderName
+            @RequestBody UserParserSettingsOpenApi userParserSettingsOpenApi
     ) {
-        if(!folderName.isEmpty()) {
-            return parserService.createParserSettings(userId, folderName, userParserSettingsOpenApi);
-        }
         return parserService.createParserSettings(userId, userParserSettingsOpenApi);
     }
 

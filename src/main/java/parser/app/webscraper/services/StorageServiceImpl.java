@@ -4,6 +4,7 @@ import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import parser.app.webscraper.exceptions.BadRequestException;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.mappers.openapi.FolderMapper;
 import parser.app.webscraper.mappers.openapi.StorageMapper;
@@ -18,6 +19,7 @@ import parser.userService.openapi.model.StorageOpenApi;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -26,6 +28,22 @@ public class StorageServiceImpl implements StorageService {
     private final StorageRepository storageRepository;
     private final StorageMapper storageMapper;
     private final FolderMapper folderMapper;
+
+    @Observed
+    @Override
+    public ResponseEntity<Void> createStorage(Long userId) {
+        Optional<Storage> storageOptional = storageRepository.findByUserId(userId);
+        if (storageOptional.isPresent()) {
+            throw new BadRequestException(String.format("Storage for User With id %d is already exists!", userId));
+        } else {
+            Storage storage = new Storage();
+            storage.setUserId(userId);
+            storageRepository.save(storage);
+            return ResponseEntity
+                    .status(201)
+                    .build();
+        }
+    }
 
     @Observed
     @Override
@@ -62,6 +80,29 @@ public class StorageServiceImpl implements StorageService {
         storageRepository.updateByUserId(userId, storage);
         return ResponseEntity
                 .ok()
+                .build();
+    }
+
+    @Observed
+    @Override
+    public ResponseEntity<Void> createFolder(UUID storageId, FolderOpenApi folderOpenApi) {
+        Folder folder = folderMapper.toFolder(folderOpenApi);
+        Storage storage = storageRepository
+                .findById(storageId)
+                .orElseThrow(() -> new NotFoundException(String.format(String.format("Storage with id %s wasn't found", storageId))));
+        List<StorageItem> storageItems = storage.getStorageItems();
+        UUID parentId = folder.getParentFolderId();
+        if (Objects.isNull(parentId)) {
+            storageItems.add(folder);
+        } else {
+            Folder parentFolder = storageRepository
+                    .findFolderById(storageItems, parentId)
+                    .orElseThrow(() -> new BadRequestException(String.format("Folder with id %s in storage (id: %s) doesn't exists!", parentId, storageId)));
+            parentFolder.getStorageItems().add(folder);
+        }
+        storageRepository.updateByStorageId(storageId, storage);
+        return ResponseEntity
+                .status(201)
                 .build();
     }
 

@@ -11,8 +11,6 @@ import java.util.UUID;
 public interface ParserService {
     ResponseEntity<Void> createParserSettings(Long userId, UserParserSettingsOpenApi userParserSettingsOpenApi);
 
-    ResponseEntity<Void> createParserSettings(Long userId, String folderName, UserParserSettingsOpenApi userParserSettingsOpenApi);
-
     UserParserSettingsOpenApi findParserSettingsById(UUID storageId, UUID settingsId);
 
     ResponseEntity<Void> updateParserSettingsById(UUID storageId, UUID settingsId, UserParserSettingsOpenApi userParserSettingsOpenApi);

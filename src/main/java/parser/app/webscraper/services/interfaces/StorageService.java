@@ -3,11 +3,12 @@ package parser.app.webscraper.services.interfaces;
 import org.springframework.http.ResponseEntity;
 import parser.userService.openapi.model.FolderOpenApi;
 import parser.userService.openapi.model.StorageOpenApi;
-import parser.userService.openapi.model.UserParserSettingsOpenApi;
 
 import java.util.UUID;
 
 public interface StorageService {
+
+    ResponseEntity<Void> createStorage(Long userId);
 
     StorageOpenApi findByStorageId(UUID storageId);
 
@@ -16,6 +17,8 @@ public interface StorageService {
     ResponseEntity<Void> updateStorageById(UUID storageId, StorageOpenApi storageOpenApi);
 
     ResponseEntity<Void> updateStorageByUserId(Long userId, StorageOpenApi storageOpenApi);
+
+    ResponseEntity<Void> createFolder(UUID storageId, FolderOpenApi folderOpenApi);
 
     FolderOpenApi findFolderById(UUID storageId, UUID folderId);
 

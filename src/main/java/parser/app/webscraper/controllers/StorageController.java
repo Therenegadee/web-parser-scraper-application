@@ -20,9 +20,23 @@ public class StorageController implements StorageApiDelegate {
     private final StorageService storageService;
 
     @Observed
+    @PostMapping
+    @Override
+    public ResponseEntity<Void> createStorage(@RequestParam(name = "userId") Long userId) {
+        return storageService.createStorage(userId);
+    }
+
+    @Observed
+    @GetMapping("/{storageId}")
+    @Override
+    public ResponseEntity<StorageOpenApi> getStorageById(@PathVariable UUID storageId) {
+        return ResponseEntity.ok(storageService.findByStorageId(storageId));
+    }
+
+    @Observed
     @GetMapping
     @Override
-    public ResponseEntity<StorageOpenApi> getStorageByUserId (
+    public ResponseEntity<StorageOpenApi> getStorageByUserId(
             @RequestParam(name = "userId") Long userId
     ) {
         return ResponseEntity.ok(storageService.findByUserId(userId));
@@ -32,7 +46,7 @@ public class StorageController implements StorageApiDelegate {
     @Observed
     @PutMapping
     @Override
-    public ResponseEntity<Void> updateStorageByUserId (
+    public ResponseEntity<Void> updateStorageByUserId(
             @RequestParam(name = "userId") Long userId,
             @RequestBody StorageOpenApi storageOpenApi
     ) {
@@ -42,13 +56,22 @@ public class StorageController implements StorageApiDelegate {
     @Observed
     @PutMapping("/{storageId}")
     @Override
-    public ResponseEntity<Void> updateStorageById (
+    public ResponseEntity<Void> updateStorageById(
             @PathVariable(name = "storageId") UUID storageId,
             @RequestBody StorageOpenApi storageOpenApi
     ) {
         return storageService.updateStorageById(storageId, storageOpenApi);
     }
 
+    @Observed
+    @PostMapping("/{storageId}/folder")
+    @Override
+    public ResponseEntity<Void> createFolder(
+            @PathVariable(name = "storageId") UUID storageId,
+            @RequestBody FolderOpenApi folder
+    ) {
+        return storageService.createFolder(storageId, folder);
+    }
 
 
     @Observed
@@ -81,5 +104,6 @@ public class StorageController implements StorageApiDelegate {
     ) {
         return storageService.deleteFolderById(storageId, folderId);
     }
+
 
 }

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import parser.app.webscraper.exceptions.BadRequestException;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.mappers.openapi.ParserResultMapper;
 import parser.app.webscraper.mappers.openapi.UserParserSettingsMapper;
@@ -36,30 +37,39 @@ public class ParserServiceImpl implements ParserService {
         Storage storage = storageRepository
                 .findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Storage of User With Id %d wasn't found", userId)));
-        storage.addStorageItem(userParserSetting);
+        UUID parentId = userParserSetting.getParentFolderId();
+        if(Objects.isNull(parentId)) {
+            storage.addStorageItem(userParserSetting);
+        } else {
+            Folder parentFolder = storageRepository
+                    .findFolderById(storage.getId(), parentId)
+                    .orElseThrow(() -> new BadRequestException(String.format("Folder to put settings in with id %s (in storage with id: %s) wasn't found!", parentId, storage.getId())));
+            parentFolder.addStorageItem(userParserSetting);
+        }
+        userParserSetting.setStorageId(storage.getId());
         storageRepository.updateByStorageId(storage.getId(), storage);
         return ResponseEntity
                 .status(201)
                 .build();
     }
 
-    @Observed
-    @Override
-    public ResponseEntity<Void> createParserSettings(
-            Long userId,
-            String folderName,
-            UserParserSettingsOpenApi userParserSettingsOpenApi
-    ) {
-        UserParserSetting userParserSetting = parserSettingsMapper.toUserParseSetting(userParserSettingsOpenApi);
-        Storage storage = storageRepository
-                .findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException(String.format("Storage of User With Id %d wasn't found", userId)));
-        storage.addStorageItemInsideFolder(userParserSetting, folderName);
-        storageRepository.updateByStorageId(storage.getId(), storage);
-        return ResponseEntity
-                .status(201)
-                .build();
-    }
+//    @Observed
+//    @Override
+//    public ResponseEntity<Void> createParserSettings(
+//            Long userId,
+//            String folderName,
+//            UserParserSettingsOpenApi userParserSettingsOpenApi
+//    ) {
+//        UserParserSetting userParserSetting = parserSettingsMapper.toUserParseSetting(userParserSettingsOpenApi);
+//        Storage storage = storageRepository
+//                .findByUserId(userId)
+//                .orElseThrow(() -> new NotFoundException(String.format("Storage of User With Id %d wasn't found", userId)));
+//        storage.addStorageItemInsideFolder(userParserSetting, folderName);
+//        storageRepository.updateByStorageId(storage.getId(), storage);
+//        return ResponseEntity
+//                .status(201)
+//                .build();
+//    }
 
     @Observed
     @Override

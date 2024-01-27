@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,7 +12,6 @@ import java.util.UUID;
 @Setter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
 @Component
 public class Folder extends StorageItem {
     @Id
@@ -19,6 +19,10 @@ public class Folder extends StorageItem {
     private UUID storageId;
     private UUID parentFolderId;
     private List<StorageItem> storageItems;
+
+    public Folder() {
+        this.storageItems = new ArrayList<>();
+    }
 
     public void addStorageItem(StorageItem storageItem) {
         storageItems.add(storageItem);

@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
-@PropertySource(value = "classpath:application.yml")
 public class ParserConfiguration {
     @Value("${webdriver.http.factory}")
     private String webDriverHttpFactory;
