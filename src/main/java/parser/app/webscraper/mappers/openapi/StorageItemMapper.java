@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 public interface StorageItemMapper {
     default StorageItem toStorageItem(StorageItemOpenApi storageItemOpenApi){
         if (storageItemOpenApi instanceof FolderOpenApi) {
-            return toFolder((FolderOpenApi) storageItemOpenApi);
+            return toFolder(storageItemOpenApi);
         } else if (storageItemOpenApi instanceof UserParserSettingsOpenApi) {
-            return toUserParserSetting((UserParserSettingsOpenApi) storageItemOpenApi);
+            return toUserParserSetting(storageItemOpenApi);
         } else return null;
     }
 
@@ -29,9 +29,9 @@ public interface StorageItemMapper {
 
     default StorageItemOpenApi toOpenApi(StorageItem storageItem) {
         if (storageItem instanceof Folder) {
-            return toOpenApi((Folder) storageItem);
+            return toOpenApi(storageItem);
         } else if (storageItem instanceof UserParserSetting) {
-            return toOpenApi((UserParserSetting) storageItem);
+            return toOpenApi(storageItem);
         } else {
             return null;
         }

@@ -29,7 +29,7 @@ public class StorageController implements StorageApiDelegate {
     @Observed
     @GetMapping("/{storageId}")
     @Override
-    public ResponseEntity<StorageOpenApi> getStorageById(@PathVariable UUID storageId) {
+    public ResponseEntity<StorageOpenApi> getStorageById(@PathVariable String storageId) {
         return ResponseEntity.ok(storageService.findByStorageId(storageId));
     }
 
@@ -57,20 +57,20 @@ public class StorageController implements StorageApiDelegate {
     @PutMapping("/{storageId}")
     @Override
     public ResponseEntity<Void> updateStorageById(
-            @PathVariable(name = "storageId") UUID storageId,
+            @PathVariable(name = "storageId") String storageId,
             @RequestBody StorageOpenApi storageOpenApi
     ) {
         return storageService.updateStorageById(storageId, storageOpenApi);
     }
 
     @Observed
-    @PostMapping("/{storageId}/folder")
+    @PostMapping("/folder")
     @Override
     public ResponseEntity<Void> createFolder(
-            @PathVariable(name = "storageId") UUID storageId,
+            @RequestParam(name = "userId") Long userId,
             @RequestBody FolderOpenApi folder
     ) {
-        return storageService.createFolder(storageId, folder);
+        return storageService.createFolder(userId, folder);
     }
 
 
@@ -78,8 +78,8 @@ public class StorageController implements StorageApiDelegate {
     @GetMapping("/{storageId}/folder/{folderId}")
     @Override
     public ResponseEntity<FolderOpenApi> getFolderByFolderId(
-            @PathVariable(name = "storageId") @Valid UUID storageId,
-            @PathVariable(name = "folderId") @Valid UUID folderId
+            @PathVariable(name = "storageId") @Valid String storageId,
+            @PathVariable(name = "folderId") @Valid String folderId
     ) {
         return ResponseEntity.ok(storageService.findFolderById(storageId, folderId));
     }
@@ -88,8 +88,8 @@ public class StorageController implements StorageApiDelegate {
     @PutMapping("/{storageId}/folder/{folderId}")
     @Override
     public ResponseEntity<Void> updateFolderById(
-            @PathVariable(name = "storageId") @Valid UUID storageId,
-            @PathVariable(name = "folderId") @Valid UUID folderId,
+            @PathVariable(name = "storageId") @Valid String storageId,
+            @PathVariable(name = "folderId") @Valid String folderId,
             @RequestBody FolderOpenApi folderOpenApi
     ) {
         return storageService.updateFolderById(storageId, folderId, folderOpenApi);
@@ -99,8 +99,8 @@ public class StorageController implements StorageApiDelegate {
     @DeleteMapping("/{storageId}/folder/{folderId}")
     @Override
     public ResponseEntity<Void> deleteFolderById(
-            @PathVariable(name = "storageId") @Valid UUID storageId,
-            @PathVariable(name = "folderId") @Valid UUID folderId
+            @PathVariable(name = "storageId") @Valid String storageId,
+            @PathVariable(name = "folderId") @Valid String folderId
     ) {
         return storageService.deleteFolderById(storageId, folderId);
     }

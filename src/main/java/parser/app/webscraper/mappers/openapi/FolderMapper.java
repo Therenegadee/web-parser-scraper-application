@@ -7,22 +7,23 @@ import parser.userService.openapi.model.FolderOpenApi;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring"
-// ,
-//        uses = {FolderIdMapper.class}
-)
+@Mapper(componentModel = "spring")
 public interface FolderMapper {
 
-    @Mapping(source = "parentFolderId", target = "parentFolderId")
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "tags", target = "tags")
     Folder toFolder(FolderOpenApi folderOpenApi);
 
-    @Mapping(source = "parentFolderId", target = "parentFolderId")
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "tags", target = "tags")
     List<Folder> toFolder(List<FolderOpenApi> folderOpenApi);
 
-    @Mapping(source = "parentFolderId", target = "parentFolderId")
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "tags", target = "tags")
     FolderOpenApi toOpenApi(Folder folder);
 
-    @Mapping(source = "parentFolderId", target = "parentFolderId")
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "tags", target = "tags")
     List<FolderOpenApi> toOpenApi(List<Folder> folder);
 
 

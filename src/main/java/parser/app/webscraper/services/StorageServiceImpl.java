@@ -8,7 +8,6 @@ import parser.app.webscraper.exceptions.BadRequestException;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.mappers.openapi.FolderMapper;
 import parser.app.webscraper.mappers.openapi.StorageMapper;
-import parser.app.webscraper.mappers.openapi.UserParserSettingsMapper;
 import parser.app.webscraper.models.Folder;
 import parser.app.webscraper.models.Storage;
 import parser.app.webscraper.models.StorageItem;
@@ -20,7 +19,6 @@ import parser.userService.openapi.model.StorageOpenApi;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +45,7 @@ public class StorageServiceImpl implements StorageService {
 
     @Observed
     @Override
-    public StorageOpenApi findByStorageId(UUID storageId) {
+    public StorageOpenApi findByStorageId(String storageId) {
         Storage storage = storageRepository
                 .findById(storageId)
                 .orElseThrow(() -> new NotFoundException(String.format("Storage with id %s wasn't found", storageId)));
@@ -65,9 +63,10 @@ public class StorageServiceImpl implements StorageService {
 
     @Observed
     @Override
-    public ResponseEntity<Void> updateStorageById(UUID storageId, StorageOpenApi storageOpenApi) {
-        Storage storage = storageMapper.toStorage(storageOpenApi);
-        storageRepository.updateByStorageId(storageId, storage);
+    public ResponseEntity<Void> updateStorageById(String storageId, StorageOpenApi storageOpenApi) {
+        Storage storageDTO = storageMapper.toStorage(storageOpenApi);
+        storageDTO.setId(storageId);
+        storageRepository.save(storageDTO);
         return ResponseEntity
                 .ok()
                 .build();
@@ -76,8 +75,12 @@ public class StorageServiceImpl implements StorageService {
     @Observed
     @Override
     public ResponseEntity<Void> updateStorageByUserId(Long userId, StorageOpenApi storageOpenApi) {
-        Storage storage = storageMapper.toStorage(storageOpenApi);
-        storageRepository.updateByUserId(userId, storage);
+        Storage storageDTO = storageMapper.toStorage(storageOpenApi);
+        Storage storage = storageRepository
+                .findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("Storage for user with id %d wasn't found", userId)));
+        storageDTO.setId(storage.getId());
+        storageRepository.save(storage);
         return ResponseEntity
                 .ok()
                 .build();
@@ -85,22 +88,19 @@ public class StorageServiceImpl implements StorageService {
 
     @Observed
     @Override
-    public ResponseEntity<Void> createFolder(UUID storageId, FolderOpenApi folderOpenApi) {
+    public ResponseEntity<Void> createFolder(Long userId, FolderOpenApi folderOpenApi) {
         Folder folder = folderMapper.toFolder(folderOpenApi);
         Storage storage = storageRepository
-                .findById(storageId)
-                .orElseThrow(() -> new NotFoundException(String.format(String.format("Storage with id %s wasn't found", storageId))));
-        List<StorageItem> storageItems = storage.getStorageItems();
-        UUID parentId = folder.getParentFolderId();
+                .findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException(String.format(String.format("Storage for user with id %s wasn't found", userId))));
+        String parentId = folder.getParentFolderId();
         if (Objects.isNull(parentId)) {
-            storageItems.add(folder);
+            storage.addStorageItem(folder);
         } else {
-            Folder parentFolder = storageRepository
-                    .findFolderById(storageItems, parentId)
-                    .orElseThrow(() -> new BadRequestException(String.format("Folder with id %s in storage (id: %s) doesn't exists!", parentId, storageId)));
-            parentFolder.getStorageItems().add(folder);
+            storage.addStorageItemInsideFolder(folder, parentId);
         }
-        storageRepository.updateByStorageId(storageId, storage);
+        folder.setStorageId(storage.getId());
+        storageRepository.save(storage);
         return ResponseEntity
                 .status(201)
                 .build();
@@ -108,43 +108,42 @@ public class StorageServiceImpl implements StorageService {
 
     @Observed
     @Override
-    public FolderOpenApi findFolderById(UUID storageId, UUID folderId) {
-        return folderMapper.toOpenApi(
-                storageRepository
-                        .findFolderById(storageId, folderId)
-                        .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", folderId, storageId)))
-        );
+    public FolderOpenApi findFolderById(String storageId, String folderId) {
+        Storage storage = storageRepository
+                .findById(storageId)
+                .orElseThrow(() -> new NotFoundException(String.format("Storage with id %s wasn't found", storageId)));
+        Folder folder = storage
+                .findFolderById(storage.getStorageItems(), folderId)
+                .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s wasn't found", folderId)));
+        return folderMapper.toOpenApi(folder);
     }
 
     @Observed
     @Override
     public ResponseEntity<Void> updateFolderById(
-            UUID storageId,
-            UUID storageItemId,
+            String storageId,
+            String folderId,
             FolderOpenApi folderOpenApi
     ) {
         Folder sourceFolder = folderMapper.toFolder(folderOpenApi);
         Storage storage = storageRepository
                 .findById(storageId)
                 .orElseThrow(() -> new NotFoundException(String.format("Storage with id %s wasn't found", storageId)));
-        List<StorageItem> storageItems = storage.getStorageItems();
 
-        Folder targetFolder = storageRepository
-                .findFolderById(storageItems, storageItemId)
-                .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", storageItemId, storageId)));
+        Folder targetFolder = storage.findFolderById(storage.getStorageItems(), folderId)
+                .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", folderId, storageId)));
 
         if (!targetFolder.getParentFolderId().equals(sourceFolder.getParentFolderId())) {
-            Folder targetParentFolder = storageRepository
-                    .findFolderById(storageItems, targetFolder.getParentFolderId())
-                    .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", storageItemId, storageId)));
+            Folder targetParentFolder = storage.findFolderById(storage.getStorageItems(), targetFolder.getParentFolderId())
+                    .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", folderId, storageId)));
             targetParentFolder.getStorageItems().remove(targetFolder);
             if (Objects.isNull(sourceFolder.getParentFolderId())) {
-                storageItems.add(targetFolder);
+                storage.addStorageItem(targetFolder);
             } else {
-                Folder sourceParentFolder = storageRepository
-                        .findFolderById(storageItems, sourceFolder.getParentFolderId())
-                        .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", storageItemId, storageId)));
-                sourceParentFolder.getStorageItems().add(targetFolder);
+                Folder sourceParentFolder = storage
+                        .findFolderById(storage.getStorageItems(), sourceFolder.getParentFolderId())
+                        .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", folderId, storageId)));
+                sourceParentFolder.addStorageItem(targetFolder);
             }
         }
 
@@ -152,7 +151,7 @@ public class StorageServiceImpl implements StorageService {
         targetFolder.setStorageItems(sourceFolder.getStorageItems());
         targetFolder.setTags(sourceFolder.getTags());
         targetFolder.setParentFolderId(sourceFolder.getParentFolderId());
-        storageRepository.updateByStorageId(storageId, storage);
+        storageRepository.save(storage);
 
         return ResponseEntity
                 .ok()
@@ -161,24 +160,21 @@ public class StorageServiceImpl implements StorageService {
 
     @Observed
     @Override
-    public ResponseEntity<Void> deleteFolderById(UUID storageId, UUID folderId) {
+    public ResponseEntity<Void> deleteFolderById(String storageId, String folderId) {
         Storage storage = storageRepository
                 .findById(storageId)
                 .orElseThrow(() -> new NotFoundException(String.format("Storage with id %s wasn't found", storageId)));
-        List<StorageItem> storageItems = storage.getStorageItems();
 
-        Folder folder = storageRepository
-                .findFolderById(storageItems, folderId)
+        Folder folder = storage.findFolderById(storage.getStorageItems(), folderId)
                 .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", folderId, storageId)));
-        Folder parentFolder = storageRepository
-                .findFolderById(storageItems, folder.getParentFolderId())
+        Folder parentFolder = storage.findFolderById(storage.getStorageItems(), folder.getParentFolderId())
                 .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", folder.getParentFolderId(), storageId)));
 
         List<StorageItem> folderItems = folder.getStorageItems();
         parentFolder.getStorageItems().remove(folder);
         storage.addStorageItems(folderItems);
 
-        storageRepository.updateByStorageId(storageId, storage);
+        storageRepository.save(storage);
 
         return ResponseEntity
                 .status(204)

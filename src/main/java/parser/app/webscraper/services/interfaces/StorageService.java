@@ -4,26 +4,25 @@ import org.springframework.http.ResponseEntity;
 import parser.userService.openapi.model.FolderOpenApi;
 import parser.userService.openapi.model.StorageOpenApi;
 
-import java.util.UUID;
 
 public interface StorageService {
 
     ResponseEntity<Void> createStorage(Long userId);
 
-    StorageOpenApi findByStorageId(UUID storageId);
+    StorageOpenApi findByStorageId(String storageId);
 
     StorageOpenApi findByUserId(Long userId);
 
-    ResponseEntity<Void> updateStorageById(UUID storageId, StorageOpenApi storageOpenApi);
+    ResponseEntity<Void> updateStorageById(String storageId, StorageOpenApi storageOpenApi);
 
     ResponseEntity<Void> updateStorageByUserId(Long userId, StorageOpenApi storageOpenApi);
 
-    ResponseEntity<Void> createFolder(UUID storageId, FolderOpenApi folderOpenApi);
+    ResponseEntity<Void> createFolder(Long userId, FolderOpenApi folderOpenApi);
 
-    FolderOpenApi findFolderById(UUID storageId, UUID folderId);
+    FolderOpenApi findFolderById(String storageId, String folderId);
 
-    ResponseEntity<Void> updateFolderById(UUID storageId, UUID storageItemId, FolderOpenApi folderOpenApi);
+    ResponseEntity<Void> updateFolderById(String storageId, String storageItemId, FolderOpenApi folderOpenApi);
 
-    ResponseEntity<Void> deleteFolderById(UUID storageId, UUID folderId);
+    ResponseEntity<Void> deleteFolderById(String storageId, String folderId);
 
 }

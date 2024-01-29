@@ -11,7 +11,6 @@ import parser.userService.openapi.api.ParserApiDelegate;
 import parser.userService.openapi.model.ParserResultOpenApi;
 import parser.userService.openapi.model.UserParserSettingsOpenApi;
 
-import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -19,8 +18,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ParserController implements ParserApiDelegate {
     private final ParserService parserService;
-
-
 
     @Observed
     @Override
@@ -36,42 +33,42 @@ public class ParserController implements ParserApiDelegate {
     @Override
     @GetMapping("/preset/{presetId}")
     public ResponseEntity<UserParserSettingsOpenApi> getParserSettingsById(
-            @PathVariable("presetId") @Valid UUID id,
-            @RequestParam(name = "storageId") UUID storageId
+            @PathVariable("presetId") @Valid String presetId,
+            @RequestParam(name = "storageId") String storageId
     ) {
-        return ResponseEntity.ok(parserService.findParserSettingsById(storageId, id));
+        return ResponseEntity.ok(parserService.findParserSettingsById(storageId, presetId));
     }
 
     @Observed
     @Override
     @DeleteMapping("/preset/{presetId}")
     public ResponseEntity<Void> deleteParserSettingsById(
-            @PathVariable("presetId") @Valid UUID id,
-            @RequestParam(name = "storageId") UUID storageId
+            @PathVariable("presetId") @Valid String presetId,
+            @RequestParam(name = "storageId") String storageId
     ) {
-        return parserService.deleteParserSettingsById(storageId, id);
+        return parserService.deleteParserSettingsById(storageId, presetId);
     }
 
     @Observed
     @Override
     @PostMapping("/preset/{presetId}")
     public ResponseEntity<Void> runParser(
-            @PathVariable("presetId") @Valid UUID id,
-            @RequestParam("storageId") UUID storageId,
+            @PathVariable("presetId") @Valid String presetId,
+            @RequestParam("storageId") String storageId,
             @RequestBody ParserResultOpenApi parserResultOpenApi
     ) {
-        return parserService.runParser(storageId, id, parserResultOpenApi);
+        return parserService.runParser(storageId, presetId, parserResultOpenApi);
     }
 
     @Observed
     @Override
     @GetMapping("/preset/{presetId}/download")
     public ResponseEntity<Resource> downloadFile(
-            @PathVariable("presetId") @Valid UUID settingsId,
-            @RequestParam("storageId") @Valid UUID storageId,
+            @PathVariable("presetId") @Valid String presetId,
+            @RequestParam("storageId") @Valid String storageId,
             @RequestParam("resultId") @Valid Long resultId
     ) {
-        return parserService.downloadFile(storageId, settingsId, resultId);
+        return parserService.downloadFile(storageId, presetId, resultId);
     }
 
 

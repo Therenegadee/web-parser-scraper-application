@@ -47,14 +47,14 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
         - name: storageId
           in: query
           description: Storage id
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
       summary: Get Parser Settings Preset by Id
       operationId: getParserSettingsById
       responses:
@@ -78,14 +78,14 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
         - name: storageId
           in: query
           description: Storage id
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
       summary: Delete Parser Settings Preset by Id
       operationId: deleteParserSettingsById
       responses:
@@ -105,14 +105,14 @@ paths:
           required: true
           schema:
             type: string
-            format: UUID
+#            format: UUID
         - name: storageId
           in: query
           description: Storage id
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
       requestBody:
         required: true
         content:
@@ -142,7 +142,7 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
             minimum: 1
           description: Parser Preset ID
         - name: storageId
@@ -151,7 +151,7 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
         - name: resultId
           in: query
           description: Parsing History Element id
@@ -259,7 +259,7 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
       operationId: getStorageById
       responses:
         200:
@@ -283,7 +283,7 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
       operationId: updateStorageById
       requestBody:
         required: true
@@ -299,19 +299,19 @@ paths:
         500:
           description: Internal Server Error
 
-  /storage/{storageId}/folder:
+  /storage/folder:
     post:
       tags:
         - storage
-      summary: Create Folder in Storage with id
+      summary: Create Folder in Storage For User with id
       parameters:
-        - name: storageId
-          in: path
-          description: Storage id
+        - name: userId
+          in: query
+          description: User id
           required: true
           schema:
-            type: string
-            format: uuid
+            type: integer
+            format: int64
       operationId: createFolder
       requestBody:
         required: true
@@ -339,14 +339,14 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
           description: The ID of Storage to retrieve
         - name: folderId
           in: path
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
           description: The ID of the folder to retrieve
       responses:
         '200':
@@ -373,14 +373,14 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
           description: The ID of Storage to update
         - name: folderId
           in: path
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
           description: The ID of the folder to update
       requestBody:
         required: true
@@ -409,14 +409,14 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
           description: The ID of Storage to delete
         - name: folderId
           in: path
           required: true
           schema:
             type: string
-            format: uuid
+#            format: uuid
           description: The ID of the folder to delete
       responses:
         '200':
@@ -457,12 +457,12 @@ components:
             - elementLocators
             - parsingHistory
           properties:
-            id:
-              type: string
-              format: uuid
+#            id:
+#              type: string
+#              format: uuid
             storageId:
               type: string
-              format: uuid
+#              format: uuid
             name:
               type: string
             tags:
@@ -494,7 +494,7 @@ components:
                 $ref: '#/components/schemas/ParserResultOpenApi'
             parentFolderId:
               type: string
-              format: uuid
+#              format: uuid
 
 
     ParserResultOpenApi:
@@ -518,7 +518,7 @@ components:
           $ref: "#/components/schemas/OutputFileTypeOpenApi"
         userParserSettingsId:
           type: string
-          format: uuid
+#          format: uuid
 
     ElementLocatorOpenApi:
       type: object
@@ -542,7 +542,7 @@ components:
           type: string
         userParserSettingsId:
           type: string
-          format: uuid
+#          format: uuid
 
     FolderOpenApi:
       allOf:
@@ -553,15 +553,15 @@ components:
             - parentFolderId
             - folderItems
           properties:
-            id:
-              type: string
-              format: uuid
+#            id:
+#              type: string
+#              format: uuid
             storageId:
               type: string
-              format: uuid
+#              format: uuid
             parentFolderId:
               type: string
-              format: uuid
+#              format: uuid
             folderItems:
               type: array
               items:
@@ -576,7 +576,7 @@ components:
       properties:
         id:
           type: string
-          format: uuid
+#          format: uuid
         userId:
           type: integer
           format: int64
@@ -588,6 +588,8 @@ components:
     StorageItemOpenApi:
       type: object
       properties:
+        id:
+          type: string
         name:
           type: string
         tags:
