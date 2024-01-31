@@ -17,12 +17,12 @@ public interface StorageService {
 
     ResponseEntity<Void> updateStorageByUserId(Long userId, StorageOpenApi storageOpenApi);
 
-    ResponseEntity<Void> createFolder(Long userId, FolderOpenApi folderOpenApi);
-
-    FolderOpenApi findFolderById(String storageId, String folderId);
-
-    ResponseEntity<Void> updateFolderById(String storageId, String storageItemId, FolderOpenApi folderOpenApi);
-
-    ResponseEntity<Void> deleteFolderById(String storageId, String folderId);
+//    ResponseEntity<Void> createFolder(Long userId, FolderOpenApi folderOpenApi);
+//
+//    FolderOpenApi findFolderById(String storageId, String folderId);
+//
+//    ResponseEntity<Void> updateFolderById(String storageId, String folderId, FolderOpenApi folderOpenApi);
+//
+//    ResponseEntity<Void> deleteFolderById(String storageId, String folderId);
 
 }

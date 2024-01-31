@@ -40,18 +40,18 @@ public class Storage {
     }
 
     public final void addStorageItemInsideFolder(StorageItem storageItem, String folderId) {
-        Folder folder = findFolderById(this.storageItems, folderId)
+        Folder folder = findFolderById(folderId)
                 .orElseThrow(() -> new NotFoundException(String.format("Folder with name %s wasn't found", folderId)));
         folder.addStorageItem(storageItem);
     }
 
     @Observed
-    public final Optional<UserParserSetting> findParserSettingsById(List<StorageItem> storageItems, String id) {
-        for (StorageItem item : storageItems) {
-            if (item instanceof UserParserSetting && ((UserParserSetting) item).getId().equals(id)) {
+    public final Optional<UserParserSetting> findParserSettingsById(String settingsId) {
+        for (StorageItem item : this.storageItems) {
+            if (item instanceof UserParserSetting && ((UserParserSetting) item).getId().equals(settingsId)) {
                 return Optional.of((UserParserSetting) item);
             } else if (item instanceof Folder) {
-                Optional<UserParserSetting> result = findParserSettingsById(((Folder) item).getStorageItems(), id);
+                Optional<UserParserSetting> result = ((Folder) item).findParserSettingsById(settingsId);
                 if (result.isPresent()) {
                     return result;
                 }
@@ -60,13 +60,14 @@ public class Storage {
         return Optional.empty();
     }
 
-    public final Optional<Folder> findFolderById(List<StorageItem> storageItems, String folderId) {
-        for (StorageItem item : storageItems) {
+    @Observed
+    public final Optional<Folder> findFolderById(String folderId) {
+        for (StorageItem item : this.storageItems) {
             if (item instanceof Folder) {
                 if (((Folder) item).getId().equals(folderId)) {
                     return Optional.of((Folder) item);
                 }
-                Optional<Folder> result = findFolderById(((Folder) item).getStorageItems(), folderId);
+                Optional<Folder> result = ((Folder) item).findFolderById(folderId);
                 if (result.isPresent()) {
                     return result;
                 }

@@ -11,7 +11,11 @@ import parser.userService.openapi.model.UserParserSettingsOpenApi;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", uses = {FolderMapper.class, UserParserSettingsMapper.class})
+@Mapper(componentModel = "spring", uses = {
+        FolderMapper.class,
+        StorageMapper.class,
+        UserParserSettingsMapper.class,
+})
 public interface StorageItemMapper {
     default StorageItem toStorageItem(StorageItemOpenApi storageItemOpenApi){
         if (storageItemOpenApi instanceof FolderOpenApi) {

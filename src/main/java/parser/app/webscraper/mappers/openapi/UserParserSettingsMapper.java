@@ -10,7 +10,9 @@ import java.util.List;
 
 @Mapper(
         componentModel = "spring",
-        uses = {DateMapper.class, ParserResultMapper.class, ElementLocatorMapper.class}
+        uses = {DateMapper.class,
+                ParserResultMapper.class,
+                ElementLocatorMapper.class,}
 )
 public interface UserParserSettingsMapper {
 

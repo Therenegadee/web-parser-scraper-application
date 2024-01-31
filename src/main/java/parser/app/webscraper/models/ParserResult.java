@@ -20,5 +20,5 @@ public class ParserResult {
     private Date date;
     private String linkToDownloadResults;
     private OutputFileType outputFileType;
-    private UUID userParserSettingId;
+    private String userParserSettingsId;
 }

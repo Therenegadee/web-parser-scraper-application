@@ -5,12 +5,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import parser.app.webscraper.services.interfaces.FolderService;
 import parser.app.webscraper.services.interfaces.StorageService;
 import parser.userService.openapi.api.StorageApiDelegate;
 import parser.userService.openapi.model.FolderOpenApi;
 import parser.userService.openapi.model.StorageOpenApi;
-
-import java.util.UUID;
 
 
 @RestController
@@ -18,6 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class StorageController implements StorageApiDelegate {
     private final StorageService storageService;
+    private final FolderService folderService;
 
     @Observed
     @PostMapping
@@ -70,7 +70,7 @@ public class StorageController implements StorageApiDelegate {
             @RequestParam(name = "userId") Long userId,
             @RequestBody FolderOpenApi folder
     ) {
-        return storageService.createFolder(userId, folder);
+        return folderService.createFolder(userId, folder);
     }
 
 
@@ -81,7 +81,7 @@ public class StorageController implements StorageApiDelegate {
             @PathVariable(name = "storageId") @Valid String storageId,
             @PathVariable(name = "folderId") @Valid String folderId
     ) {
-        return ResponseEntity.ok(storageService.findFolderById(storageId, folderId));
+        return ResponseEntity.ok(folderService.findFolderById(storageId, folderId));
     }
 
     @Observed
@@ -92,7 +92,7 @@ public class StorageController implements StorageApiDelegate {
             @PathVariable(name = "folderId") @Valid String folderId,
             @RequestBody FolderOpenApi folderOpenApi
     ) {
-        return storageService.updateFolderById(storageId, folderId, folderOpenApi);
+        return folderService.updateFolderById(storageId, folderId, folderOpenApi);
     }
 
     @Observed
@@ -102,7 +102,7 @@ public class StorageController implements StorageApiDelegate {
             @PathVariable(name = "storageId") @Valid String storageId,
             @PathVariable(name = "folderId") @Valid String folderId
     ) {
-        return storageService.deleteFolderById(storageId, folderId);
+        return folderService.deleteFolderById(storageId, folderId);
     }
 
 

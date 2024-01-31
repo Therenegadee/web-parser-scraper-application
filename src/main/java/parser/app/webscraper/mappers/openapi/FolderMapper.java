@@ -7,7 +7,8 @@ import parser.userService.openapi.model.FolderOpenApi;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",
+        uses = {StorageItemMapper.class})
 public interface FolderMapper {
 
     @Mapping(source = "name", target = "name")
@@ -25,7 +26,5 @@ public interface FolderMapper {
     @Mapping(source = "name", target = "name")
     @Mapping(source = "tags", target = "tags")
     List<FolderOpenApi> toOpenApi(List<Folder> folder);
-
-
 
 }

@@ -29,5 +29,5 @@ public class ElementLocator {
     private ElementType type;
     private String pathToLocator;
     private String extraPointer; // for Tag + Attribute
-    private UUID userParserSettingsId;
+    private String userParserSettingsId;
 }
