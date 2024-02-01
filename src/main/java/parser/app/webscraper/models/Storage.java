@@ -29,7 +29,7 @@ public class Storage {
     }
 
     public final void addStorageItem(StorageItem storageItem) {
-        if(Objects.isNull(storageItem.getId())) {
+        if (Objects.isNull(storageItem.getId())) {
             storageItem.setId(IdGenerator.generateId(storageItem));
         }
         storageItems.add(storageItem);
@@ -41,17 +41,17 @@ public class Storage {
 
     public final void addStorageItemInsideFolder(StorageItem storageItem, String folderId) {
         Folder folder = findFolderById(folderId)
-                .orElseThrow(() -> new NotFoundException(String.format("Folder with name %s wasn't found", folderId)));
+                .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s wasn't found", folderId)));
         folder.addStorageItem(storageItem);
     }
 
     @Observed
-    public final Optional<UserParserSetting> findParserSettingsById(String settingsId) {
+    public final Optional<ParsingPreset> findParserSettingsById(String settingsId) {
         for (StorageItem item : this.storageItems) {
-            if (item instanceof UserParserSetting && ((UserParserSetting) item).getId().equals(settingsId)) {
-                return Optional.of((UserParserSetting) item);
+            if (item instanceof ParsingPreset && item.getId().equals(settingsId)) {
+                return Optional.of((ParsingPreset) item);
             } else if (item instanceof Folder) {
-                Optional<UserParserSetting> result = ((Folder) item).findParserSettingsById(settingsId);
+                Optional<ParsingPreset> result = ((Folder) item).findParserSettingsById(settingsId);
                 if (result.isPresent()) {
                     return result;
                 }
@@ -64,12 +64,45 @@ public class Storage {
     public final Optional<Folder> findFolderById(String folderId) {
         for (StorageItem item : this.storageItems) {
             if (item instanceof Folder) {
-                if (((Folder) item).getId().equals(folderId)) {
+                if (item.getId().equals(folderId)) {
                     return Optional.of((Folder) item);
                 }
                 Optional<Folder> result = ((Folder) item).findFolderById(folderId);
                 if (result.isPresent()) {
                     return result;
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Observed
+    public final Optional<StorageItem[]> findSettingsWithParentFolder(String settingsId) {
+        StorageItem[] settingsWithParentFolder = new StorageItem[2];
+        for (StorageItem item : this.storageItems) {
+            if (item instanceof Folder) {
+                Optional<ParsingPreset> result = ((Folder) item).findParserSettingsById(settingsId);
+                if (result.isPresent()) {
+                    settingsWithParentFolder[0] = item;
+                    settingsWithParentFolder[1] = result.get();
+                    return Optional.of(settingsWithParentFolder);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Observed
+    public final Optional<Folder[]> findFolderWithParentFolder(String folderId) {
+        for (StorageItem item : this.storageItems) {
+            if (item instanceof Folder) {
+                if (item.getId().equals(folderId)) {
+                    Folder[] folderWithParentFolder = new Folder[2];
+                    folderWithParentFolder[0] = null;
+                    folderWithParentFolder[1] = (Folder) item;
+                    return Optional.of(folderWithParentFolder);
+                } else {
+                    return ((Folder) item).findFolderWithParentFolder(folderId);
                 }
             }
         }

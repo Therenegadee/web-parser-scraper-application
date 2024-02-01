@@ -5,8 +5,6 @@ import io.micrometer.observation.annotation.Observed;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
 import parser.app.webscraper.utils.IdGenerator;
 
@@ -54,12 +52,12 @@ public class Folder extends StorageItem {
     }
 
     @Observed
-    public final Optional<UserParserSetting> findParserSettingsById(String settingsId) {
+    public final Optional<ParsingPreset> findParserSettingsById(String settingsId) {
         for (StorageItem item : this.folderItems) {
-            if (item instanceof UserParserSetting && ((UserParserSetting) item).getId().equals(settingsId)) {
-                return Optional.of((UserParserSetting) item);
+            if (item instanceof ParsingPreset && ((ParsingPreset) item).getId().equals(settingsId)) {
+                return Optional.of((ParsingPreset) item);
             } else if (item instanceof Folder) {
-                Optional<UserParserSetting> result = ((Folder) item).findParserSettingsById(settingsId);
+                Optional<ParsingPreset> result = ((Folder) item).findParserSettingsById(settingsId);
                 if (result.isPresent()) {
                     return result;
                 }
@@ -78,6 +76,23 @@ public class Folder extends StorageItem {
                 Optional<Folder> result = ((Folder) item).findFolderById(folderId);
                 if (result.isPresent()) {
                     return result;
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Observed
+    public final Optional<Folder[]> findFolderWithParentFolder(String folderId) {
+        for(StorageItem item : this.folderItems) {
+            if (item instanceof Folder) {
+                if (item.getId().equals(folderId)) {
+                    Folder[] folderWithParentFolder = new Folder[2];
+                    folderWithParentFolder[0] = null;
+                    folderWithParentFolder[1] = (Folder) item;
+                    return Optional.of(folderWithParentFolder);
+                } else {
+                    return ((Folder) item).findFolderWithParentFolder(folderId);
                 }
             }
         }

@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import parser.app.webscraper.mappers.DateMapper;
 import parser.app.webscraper.models.ParserResult;
-import parser.userService.openapi.model.ParserResultOpenApi;
+import parser.userService.openapi.model.ParserResultDTO;
 
 import java.util.List;
 import java.util.Set;
@@ -12,15 +12,15 @@ import java.util.Set;
 @Mapper(componentModel = "spring", uses = {DateMapper.class})
 public interface ParserResultMapper {
     @Mapping(target = "date", source = "date", dateFormat = "yyyy-MM-dd'T'HH:mm:ssXXX")
-    ParserResult toParserResult(ParserResultOpenApi parserResultOpenApi);
+    ParserResult toParserResult(ParserResultDTO parserResultDTO);
     @Mapping(target = "date", source = "date", dateFormat = "yyyy-MM-dd'T'HH:mm:ssXXX")
-    ParserResultOpenApi toOpenApi(ParserResult parserResult);
+    ParserResultDTO toDTO(ParserResult parserResult);
     @Mapping(target = "date", source = "date", dateFormat = "yyyy-MM-dd'T'HH:mm:ssXXX")
-    List<ParserResult> toParserResult(List<ParserResultOpenApi> parserResultsOpenApi);
+    List<ParserResult> toParserResult(List<ParserResultDTO> parserResultsDTO);
     @Mapping(target = "date", source = "date", dateFormat = "yyyy-MM-dd'T'HH:mm:ssXXX")
-    List<ParserResultOpenApi> toOpenApi(List<ParserResult> parserResults);
+    List<ParserResultDTO> toDTO(List<ParserResult> parserResults);
     @Mapping(target = "date", source = "date", dateFormat = "yyyy-MM-dd'T'HH:mm:ssXXX")
-    Set<ParserResult> toParserResult(Set<ParserResultOpenApi> parserResultsOpenApi);
+    Set<ParserResult> toParserResult(Set<ParserResultDTO> parserResultsDTO);
     @Mapping(target = "date", source = "date", dateFormat = "yyyy-MM-dd'T'HH:mm:ssXXX")
-    Set<ParserResultOpenApi> toOpenApi(Set<ParserResult> parserResults);
+    Set<ParserResultDTO> toDTO(Set<ParserResult> parserResults);
 }

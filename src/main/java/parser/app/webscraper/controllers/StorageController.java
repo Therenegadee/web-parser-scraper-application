@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import parser.app.webscraper.services.interfaces.FolderService;
 import parser.app.webscraper.services.interfaces.StorageService;
 import parser.userService.openapi.api.StorageApiDelegate;
-import parser.userService.openapi.model.FolderOpenApi;
-import parser.userService.openapi.model.StorageOpenApi;
+import parser.userService.openapi.model.FolderDTO;
+import parser.userService.openapi.model.StorageDTO;
 
 
 @RestController
@@ -29,14 +29,14 @@ public class StorageController implements StorageApiDelegate {
     @Observed
     @GetMapping("/{storageId}")
     @Override
-    public ResponseEntity<StorageOpenApi> getStorageById(@PathVariable String storageId) {
+    public ResponseEntity<StorageDTO> getStorageById(@PathVariable String storageId) {
         return ResponseEntity.ok(storageService.findByStorageId(storageId));
     }
 
     @Observed
     @GetMapping
     @Override
-    public ResponseEntity<StorageOpenApi> getStorageByUserId(
+    public ResponseEntity<StorageDTO> getStorageByUserId(
             @RequestParam(name = "userId") Long userId
     ) {
         return ResponseEntity.ok(storageService.findByUserId(userId));
@@ -48,9 +48,9 @@ public class StorageController implements StorageApiDelegate {
     @Override
     public ResponseEntity<Void> updateStorageByUserId(
             @RequestParam(name = "userId") Long userId,
-            @RequestBody StorageOpenApi storageOpenApi
+            @RequestBody StorageDTO storageDTO
     ) {
-        return storageService.updateStorageByUserId(userId, storageOpenApi);
+        return storageService.updateStorageByUserId(userId, storageDTO);
     }
 
     @Observed
@@ -58,9 +58,9 @@ public class StorageController implements StorageApiDelegate {
     @Override
     public ResponseEntity<Void> updateStorageById(
             @PathVariable(name = "storageId") String storageId,
-            @RequestBody StorageOpenApi storageOpenApi
+            @RequestBody StorageDTO storageDTO
     ) {
-        return storageService.updateStorageById(storageId, storageOpenApi);
+        return storageService.updateStorageById(storageId, storageDTO);
     }
 
     @Observed
@@ -68,7 +68,7 @@ public class StorageController implements StorageApiDelegate {
     @Override
     public ResponseEntity<Void> createFolder(
             @RequestParam(name = "userId") Long userId,
-            @RequestBody FolderOpenApi folder
+            @RequestBody FolderDTO folder
     ) {
         return folderService.createFolder(userId, folder);
     }
@@ -77,7 +77,7 @@ public class StorageController implements StorageApiDelegate {
     @Observed
     @GetMapping("/{storageId}/folder/{folderId}")
     @Override
-    public ResponseEntity<FolderOpenApi> getFolderByFolderId(
+    public ResponseEntity<FolderDTO> getFolderByFolderId(
             @PathVariable(name = "storageId") @Valid String storageId,
             @PathVariable(name = "folderId") @Valid String folderId
     ) {
@@ -90,9 +90,9 @@ public class StorageController implements StorageApiDelegate {
     public ResponseEntity<Void> updateFolderById(
             @PathVariable(name = "storageId") @Valid String storageId,
             @PathVariable(name = "folderId") @Valid String folderId,
-            @RequestBody FolderOpenApi folderOpenApi
+            @RequestBody FolderDTO folderDTO
     ) {
-        return folderService.updateFolderById(storageId, folderId, folderOpenApi);
+        return folderService.updateFolderById(storageId, folderId, folderDTO);
     }
 
     @Observed

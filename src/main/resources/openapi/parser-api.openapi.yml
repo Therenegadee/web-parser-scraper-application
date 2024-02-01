@@ -26,7 +26,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserParserSettingsOpenApi"
+              $ref: "#/components/schemas/ParsingPresetDTO"
       responses:
         '201':
           description: Parser Settings Preset was Created Successfully
@@ -47,14 +47,12 @@ paths:
           required: true
           schema:
             type: string
-#            format: uuid
         - name: storageId
           in: query
           description: Storage id
           required: true
           schema:
             type: string
-#            format: uuid
       summary: Get Parser Settings Preset by Id
       operationId: getParserSettingsById
       responses:
@@ -63,7 +61,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserParserSettingsOpenApi"
+                $ref: "#/components/schemas/ParsingPresetDTO"
         '401':
           $ref: "#/components/responses/UnauthorizedError"
         '500':
@@ -78,14 +76,12 @@ paths:
           required: true
           schema:
             type: string
-#            format: uuid
         - name: storageId
           in: query
           description: Storage id
           required: true
           schema:
             type: string
-#            format: uuid
       summary: Delete Parser Settings Preset by Id
       operationId: deleteParserSettingsById
       responses:
@@ -112,13 +108,12 @@ paths:
           required: true
           schema:
             type: string
-#            format: uuid
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ParserResultOpenApi"
+              $ref: "#/components/schemas/ParserResultDTO"
       summary: Run Parser With Concrete Preset by its Id and Saving New Parsing History With Current Date
       operationId: runParser
       responses:
@@ -142,7 +137,6 @@ paths:
           required: true
           schema:
             type: string
-#            format: uuid
             minimum: 1
           description: Parser Preset ID
         - name: storageId
@@ -151,7 +145,6 @@ paths:
           required: true
           schema:
             type: string
-#            format: uuid
         - name: resultId
           in: query
           description: Parsing History Element id
@@ -214,7 +207,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StorageOpenApi"
+                $ref: "#/components/schemas/StorageDTO"
         401:
           $ref: "#/components/responses/UnauthorizedError"
         500:
@@ -237,7 +230,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StorageOpenApi"
+              $ref: "#/components/schemas/StorageDTO"
       responses:
         200:
           description: The Storage was retrieved successfully
@@ -259,7 +252,6 @@ paths:
           required: true
           schema:
             type: string
-#            format: uuid
       operationId: getStorageById
       responses:
         200:
@@ -267,7 +259,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StorageOpenApi"
+                $ref: "#/components/schemas/StorageDTO"
         401:
           $ref: "#/components/responses/UnauthorizedError"
         500:
@@ -283,14 +275,13 @@ paths:
           required: true
           schema:
             type: string
-#            format: uuid
       operationId: updateStorageById
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StorageOpenApi"
+              $ref: "#/components/schemas/StorageDTO"
       responses:
         200:
           description: The Storage was updated successfully
@@ -318,7 +309,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FolderOpenApi'
+              $ref: '#/components/schemas/FolderDTO'
       responses:
         201:
           description: The Folder was created successfully
@@ -339,14 +330,12 @@ paths:
           required: true
           schema:
             type: string
-#            format: uuid
           description: The ID of Storage to retrieve
         - name: folderId
           in: path
           required: true
           schema:
             type: string
-#            format: uuid
           description: The ID of the folder to retrieve
       responses:
         '200':
@@ -354,7 +343,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FolderOpenApi'
+                $ref: '#/components/schemas/FolderDTO'
         401:
           $ref: "#/components/responses/UnauthorizedError"
         '404':
@@ -373,21 +362,19 @@ paths:
           required: true
           schema:
             type: string
-#            format: uuid
           description: The ID of Storage to update
         - name: folderId
           in: path
           required: true
           schema:
             type: string
-#            format: uuid
           description: The ID of the folder to update
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/FolderOpenApi"
+              $ref: "#/components/schemas/FolderDTO"
       responses:
         '200':
           description: The folder was updated successfully
@@ -409,14 +396,12 @@ paths:
           required: true
           schema:
             type: string
-#            format: uuid
           description: The ID of Storage to delete
         - name: folderId
           in: path
           required: true
           schema:
             type: string
-#            format: uuid
           description: The ID of the folder to delete
       responses:
         '200':
@@ -442,9 +427,9 @@ components:
 
   schemas:
 
-    UserParserSettingsOpenApi:
+    ParsingPresetDTO:
       allOf:
-        - $ref: '#/components/schemas/StorageItemOpenApi'
+        - $ref: '#/components/schemas/StorageItemDTO'
         - type: object
           required:
             - storageId
@@ -487,22 +472,22 @@ components:
             elementLocators:
               type: array
               items:
-                $ref: '#/components/schemas/ElementLocatorOpenApi'
+                $ref: '#/components/schemas/ElementLocatorDTO'
             parsingHistory:
               type: array
               items:
-                $ref: '#/components/schemas/ParserResultOpenApi'
+                $ref: '#/components/schemas/ParserResultDTO'
             parentFolderId:
               type: string
 #              format: uuid
 
 
-    ParserResultOpenApi:
+    ParserResultDTO:
       type: object
       required:
         - date
         - outputFileType
-        - userParserSettingsId
+        - parsingPresetId
         - linkToDownloadResults
       properties:
         id:
@@ -515,18 +500,18 @@ components:
           type: string
         outputFileType:
           type: object
-          $ref: "#/components/schemas/OutputFileTypeOpenApi"
-        userParserSettingsId:
+          $ref: "#/components/schemas/OutputFileTypeDTO"
+        parsingPresetId:
           type: string
 #          format: uuid
 
-    ElementLocatorOpenApi:
+    ElementLocatorDTO:
       type: object
       required:
         - name
         - elementType
         - pathToLocator
-        - userParserSettingsId
+        - parsingPresetId
       properties:
         id:
           type: integer
@@ -535,18 +520,18 @@ components:
           type: string
         elementType:
           type: object
-          $ref: "#/components/schemas/ElementTypeOpenApi"
+          $ref: "#/components/schemas/ElementTypeDTO"
         pathToLocator:
           type: string
         extraPointer:
           type: string
-        userParserSettingsId:
+        parsingPresetId:
           type: string
 #          format: uuid
 
-    FolderOpenApi:
+    FolderDTO:
       allOf:
-        - $ref: '#/components/schemas/StorageItemOpenApi'
+        - $ref: '#/components/schemas/StorageItemDTO'
         - type: object
           required:
             - storageId
@@ -565,9 +550,9 @@ components:
             folderItems:
               type: array
               items:
-                $ref: '#/components/schemas/StorageItemOpenApi'
+                $ref: '#/components/schemas/StorageItemDTO'
 
-    StorageOpenApi:
+    StorageDTO:
       type: object
       required:
         - id
@@ -583,9 +568,9 @@ components:
         storageItems:
           type: array
           items:
-            $ref: '#/components/schemas/StorageItemOpenApi'
+            $ref: '#/components/schemas/StorageItemDTO'
 
-    StorageItemOpenApi:
+    StorageItemDTO:
       type: object
       properties:
         id:
@@ -597,13 +582,13 @@ components:
           items:
             type: string
 
-    OutputFileTypeOpenApi:
+    OutputFileTypeDTO:
       type: string
       enum:
         - XLSX
         - CSV
 
-    ElementTypeOpenApi:
+    ElementTypeDTO:
       type: string
       enum:
         - XPATH

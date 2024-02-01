@@ -2,24 +2,24 @@ package parser.app.webscraper.services.interfaces;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
-import parser.userService.openapi.model.ParserResultOpenApi;
-import parser.userService.openapi.model.UserParserSettingsOpenApi;
+import parser.userService.openapi.model.ParserResultDTO;
+import parser.userService.openapi.model.ParsingPresetDTO;
 
 import java.util.List;
 
 public interface ParserService {
-    ResponseEntity<Void> createParserSettings(Long userId, UserParserSettingsOpenApi userParserSettingsOpenApi);
+    ResponseEntity<Void> createParserSettings(Long userId, ParsingPresetDTO parsingPresetDTO);
 
-    UserParserSettingsOpenApi findParserSettingsById(String storageId, String settingsId);
+    ParsingPresetDTO findParserSettingsById(String storageId, String settingsId);
 
-    ResponseEntity<Void> updateParserSettingsById(String storageId, String settingsId, UserParserSettingsOpenApi userParserSettingsOpenApi);
+    ResponseEntity<Void> updateParserSettingsById(String storageId, String settingsId, ParsingPresetDTO parsingPresetDTO);
 
     ResponseEntity<Void> deleteParserSettingsById(String storageId, String settingsId);
 
-    List<UserParserSettingsOpenApi> getAllParserSettingsByUserId(Long userId);
+    List<ParsingPresetDTO> getAllParserSettingsByUserId(Long userId);
 
 
-    ResponseEntity<Void> runParser(String storageId, String settingsId, ParserResultOpenApi parserResultOpenApi);
+    ResponseEntity<Void> runParser(String storageId, String settingsId, ParserResultDTO parserResultDTO);
 
     ResponseEntity<Resource> downloadFile(String storageId, String settingsId, Long parserResultId);
 }

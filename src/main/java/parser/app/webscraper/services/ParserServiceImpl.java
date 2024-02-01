@@ -6,18 +6,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import parser.app.webscraper.exceptions.BadRequestException;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.mappers.openapi.ParserResultMapper;
-import parser.app.webscraper.mappers.openapi.UserParserSettingsMapper;
-import parser.app.webscraper.models.Folder;
-import parser.app.webscraper.models.ParserResult;
-import parser.app.webscraper.models.Storage;
-import parser.app.webscraper.models.UserParserSetting;
+import parser.app.webscraper.mappers.openapi.ParsingPresetMapper;
+import parser.app.webscraper.models.*;
 import parser.app.webscraper.repository.StorageRepository;
 import parser.app.webscraper.services.interfaces.ParserService;
-import parser.userService.openapi.model.ParserResultOpenApi;
-import parser.userService.openapi.model.UserParserSettingsOpenApi;
+import parser.userService.openapi.model.ParserResultDTO;
+import parser.userService.openapi.model.ParsingPresetDTO;
 
 import java.util.List;
 import java.util.Objects;
@@ -29,27 +27,28 @@ import java.util.stream.Collectors;
 public class ParserServiceImpl implements ParserService {
 
     private final StorageRepository storageRepository;
-    private final UserParserSettingsMapper parserSettingsMapper;
+    private final ParsingPresetMapper parserSettingsMapper;
     private final ParserResultMapper parserResultMapper;
 
     @Observed
+    @Transactional
     @Override
-    public ResponseEntity<Void> createParserSettings(Long userId, UserParserSettingsOpenApi userParserSettingsOpenApi) {
-        UserParserSetting userParserSetting = parserSettingsMapper.toUserParseSetting(userParserSettingsOpenApi);
+    public ResponseEntity<Void> createParserSettings(Long userId, ParsingPresetDTO parsingPresetDTO) {
+        ParsingPreset parsingPreset = parserSettingsMapper.toUserParseSetting(parsingPresetDTO);
         Storage storage = storageRepository
                 .findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Storage of User With Id %d wasn't found", userId)));
-        String parentId = userParserSettingsOpenApi.getParentFolderId();
+        String parentId = parsingPresetDTO.getParentFolderId();
         if (Objects.isNull(parentId)) {
-            storage.addStorageItem(userParserSetting);
+            storage.addStorageItem(parsingPreset);
         } else {
             Folder parentFolder = storage
                     .findFolderById(parentId)
                     .orElseThrow(() -> new BadRequestException(String.format("Folder to put settings in with id %s (in storage with id: %s) wasn't found!", parentId, storage.getId())));
-            userParserSetting.setParentFolderId(parentFolder.getId());
-            parentFolder.addStorageItem(userParserSetting);
+            parsingPreset.setParentFolderId(parentFolder.getId());
+            parentFolder.addStorageItem(parsingPreset);
         }
-        userParserSetting.setStorageId(storage.getId());
+        parsingPreset.setStorageId(storage.getId());
         storageRepository.save(storage);
         return ResponseEntity
                 .status(201)
@@ -57,48 +56,51 @@ public class ParserServiceImpl implements ParserService {
     }
 
     @Observed
+    @Transactional
     @Override
-    public List<UserParserSettingsOpenApi> getAllParserSettingsByUserId(Long userId) {
+    public List<ParsingPresetDTO> getAllParserSettingsByUserId(Long userId) {
         Storage storage = storageRepository
                 .findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Storage For User with id %s wasn't found", userId)));
-        List<UserParserSetting> userParserSetting = storage.getStorageItems()
+        List<ParsingPreset> parsingPreset = storage.getStorageItems()
                 .stream()
-                .filter(item -> item instanceof UserParserSetting)
-                .map(item -> (UserParserSetting) item)
+                .filter(item -> item instanceof ParsingPreset)
+                .map(item -> (ParsingPreset) item)
                 .collect(Collectors.toList());
-        return parserSettingsMapper.toOpenApi(userParserSetting);
+        return parserSettingsMapper.toDTO(parsingPreset);
     }
 
     @Observed
+    @Transactional
     @Override
-    public UserParserSettingsOpenApi findParserSettingsById(String storageId, String settingsId) {
+    public ParsingPresetDTO findParserSettingsById(String storageId, String settingsId) {
         Storage storage = storageRepository
                 .findById(storageId)
                 .orElseThrow(() -> new NotFoundException(String.format("Storage with id %s wasn't found", storageId)));
-        return parserSettingsMapper.toOpenApi(
+        return parserSettingsMapper.toDTO(
                 storage.findParserSettingsById(settingsId)
-                        .orElseThrow(() -> new NotFoundException(String.format("UserParserSetting with id %s in Storage (id: %s) wasn't found", settingsId, storageId)))
+                        .orElseThrow(() -> new NotFoundException(String.format("ParsingPreset with id %s in Storage (id: %s) wasn't found", settingsId, storageId)))
         );
     }
 
     @Observed
+    @Transactional
     @Override
     public ResponseEntity<Void> updateParserSettingsById(
             String storageId,
             String settingsId,
-            UserParserSettingsOpenApi userParserSettingsOpenApi
+            ParsingPresetDTO parsingPresetDTO
     ) {
-        UserParserSetting sourceSetting = parserSettingsMapper.toUserParseSetting(userParserSettingsOpenApi);
+        ParsingPreset sourceSetting = parserSettingsMapper.toUserParseSetting(parsingPresetDTO);
         Storage storage = storageRepository
                 .findById(storageId)
                 .orElseThrow(() -> new NotFoundException(String.format("Storage with id %s wasn't found", storageId)));
-        UserParserSetting targetSetting = storage.findParserSettingsById(settingsId)
+        ParsingPreset targetSetting = storage.findParserSettingsById(settingsId)
                 .orElseThrow(() -> new NotFoundException(String.format("Settings with id %s wasn't found", settingsId)));
 
-        if (!targetSetting.getParentFolderId().equals(userParserSettingsOpenApi.getParentFolderId())) {
-            String parentFolderId = userParserSettingsOpenApi.getParentFolderId();
-            if(Objects.nonNull(targetSetting.getParentFolderId())) {
+        if (!targetSetting.getParentFolderId().equals(parsingPresetDTO.getParentFolderId())) {
+            String parentFolderId = parsingPresetDTO.getParentFolderId();
+            if (Objects.nonNull(targetSetting.getParentFolderId())) {
                 Folder exParentFolder = storage
                         .findFolderById(targetSetting.getParentFolderId())
                         .orElseThrow(() -> new BadRequestException(String.format("Parent Folder with id %s to put settings in doesn't exist", parentFolderId)));
@@ -106,7 +108,7 @@ public class ParserServiceImpl implements ParserService {
             } else {
                 storage.getStorageItems().remove(targetSetting);
             }
-            if(Objects.isNull(parentFolderId)) {
+            if (Objects.isNull(parentFolderId)) {
                 storage.addStorageItem(targetSetting);
             } else {
                 Folder parentFolder = storage
@@ -128,30 +130,39 @@ public class ParserServiceImpl implements ParserService {
         targetSetting.setElementLocators(sourceSetting.getElementLocators());
         targetSetting.setParsingHistory(sourceSetting.getParsingHistory());
 
-        userParserSettingsRepository.save(targetSetting);
+        storageRepository.save(storage);
         return ResponseEntity
                 .ok()
                 .build();
     }
 
     @Observed
+    @Transactional
     @Override
     public ResponseEntity<Void> deleteParserSettingsById(String storageId, String settingsId) {
-        UserParserSetting userParserSetting = userParserSettingsRepository
-                .findByStorageIdAndId(storageId, settingsId)
+        Storage storage = storageRepository
+                .findById(storageId)
+                .orElseThrow(() -> new NotFoundException(String.format("Storage with id %s wasn't found", storageId)));
+        StorageItem[] settingsWithFolder = storage
+                .findSettingsWithParentFolder(settingsId)
                 .orElseThrow(() -> new NotFoundException(String.format("Settings with id %s wasn't found", settingsId)));
-        userParserSettingsRepository.delete(userParserSetting);
+        Folder parentFolder = (Folder) settingsWithFolder[0];
+        parentFolder.getFolderItems().remove(settingsWithFolder[1]);
         return ResponseEntity
                 .status(204)
                 .build();
     }
 
     @Observed
+    @Transactional
     @Override
-    public ResponseEntity<Void> runParser(String storageId, String settingsId, ParserResultOpenApi parserResultOpenApi) {
-        ParserResult parserResult = parserResultMapper.toParserResult(parserResultOpenApi);
-        UserParserSetting userParserSetting = userParserSettingsRepository
-                .findByStorageIdAndId(storageId, settingsId)
+    public ResponseEntity<Void> runParser(String storageId, String settingsId, ParserResultDTO parserResultDTO) {
+        ParserResult parserResult = parserResultMapper.toParserResult(parserResultDTO);
+        Storage storage = storageRepository
+                .findById(storageId)
+                .orElseThrow(() -> new NotFoundException(String.format("Storage with id %s wasn't found", storageId)));
+        ParsingPreset parsingPreset = storage
+                .findParserSettingsById(settingsId)
                 .orElseThrow(() -> new NotFoundException(String.format("Settings with id %s wasn't found", settingsId)));
 
         //todo: прописать логику запуска парсера
@@ -159,15 +170,16 @@ public class ParserServiceImpl implements ParserService {
         //TODO: добавить файл сервис и ссылку на скачивание
 
         parserResult.setLinkToDownloadResults("");
-        userParserSetting.addParserResult(parserResult);
-        userParserSettingsRepository.save(userParserSetting);
+        parsingPreset.addParserResult(parserResult);
+        storageRepository.save(storage);
         return ResponseEntity
                 .ok()
                 .build();
     }
 
-    @Override
     @Observed
+    @Transactional
+    @Override
     public ResponseEntity<Resource> downloadFile(String storageId, String settingsId, Long parserResultId) {
         return null;
     }

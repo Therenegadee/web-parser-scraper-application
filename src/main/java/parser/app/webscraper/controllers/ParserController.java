@@ -8,10 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import parser.app.webscraper.services.interfaces.ParserService;
 import parser.userService.openapi.api.ParserApiDelegate;
-import parser.userService.openapi.model.ParserResultOpenApi;
-import parser.userService.openapi.model.UserParserSettingsOpenApi;
-
-import java.util.UUID;
+import parser.userService.openapi.model.ParserResultDTO;
+import parser.userService.openapi.model.ParsingPresetDTO;
 
 @RestController
 @RequestMapping("/api/parser")
@@ -24,15 +22,15 @@ public class ParserController implements ParserApiDelegate {
     @PostMapping("/preset")
     public ResponseEntity<Void> createParserSettings(
             @RequestParam(name = "userId") Long userId,
-            @RequestBody UserParserSettingsOpenApi userParserSettingsOpenApi
+            @RequestBody ParsingPresetDTO parsingPresetDTO
     ) {
-        return parserService.createParserSettings(userId, userParserSettingsOpenApi);
+        return parserService.createParserSettings(userId, parsingPresetDTO);
     }
 
     @Observed
     @Override
     @GetMapping("/preset/{presetId}")
-    public ResponseEntity<UserParserSettingsOpenApi> getParserSettingsById(
+    public ResponseEntity<ParsingPresetDTO> getParserSettingsById(
             @PathVariable("presetId") @Valid String presetId,
             @RequestParam(name = "storageId") String storageId
     ) {
@@ -55,9 +53,9 @@ public class ParserController implements ParserApiDelegate {
     public ResponseEntity<Void> runParser(
             @PathVariable("presetId") @Valid String presetId,
             @RequestParam("storageId") String storageId,
-            @RequestBody ParserResultOpenApi parserResultOpenApi
+            @RequestBody ParserResultDTO parserResultDTO
     ) {
-        return parserService.runParser(storageId, presetId, parserResultOpenApi);
+        return parserService.runParser(storageId, presetId, parserResultDTO);
     }
 
     @Observed

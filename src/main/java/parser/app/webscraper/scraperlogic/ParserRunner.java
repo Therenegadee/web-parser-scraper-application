@@ -13,7 +13,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parser.app.webscraper.config.ParserConfiguration;
-import parser.app.webscraper.dto.ParsingPreset;
+import parser.app.webscraper.models.ParsingPreset;
 import parser.app.webscraper.models.ElementLocator;
 import parser.app.webscraper.scraperlogic.logic.element.ParseElement;
 import parser.app.webscraper.scraperlogic.logic.outputFile.OutputFile;
@@ -63,7 +63,7 @@ public class ParserRunner {
         System.out.println("Парсинг закончен.");
         driver.quit();
 
-        OutputFileType fileType = parsingPreset.getOutputFileType();
+        OutputFileType fileType = parsingPreset.get();
         StringBuilder fileNameBuilder = new StringBuilder(UUID.randomUUID().toString());
         fileNameBuilder.append("file");
 
@@ -75,7 +75,7 @@ public class ParserRunner {
         header.add(0, "URL");
 
         String fileName = fileNameBuilder.toString();
-        String outPutFilePath = "src/main/resources/savedFilesDirectory/" + parsingPreset.getUsername() + "/" +fileName;
+        String outPutFilePath = "src/main/resources/savedFilesDirectory/" + parsingPreset.getStorageId() + "/" +fileName;
         OutputFile outputFile = new OutputFile(fileType);
         outputFile.exportData(header, allPagesParseResult, outPutFilePath);
         return outPutFilePath;

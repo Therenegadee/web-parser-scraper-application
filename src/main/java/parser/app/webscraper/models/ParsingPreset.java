@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Component
-public class UserParserSetting extends StorageItem {
+public class ParsingPreset extends StorageItem {
     private String firstPageUrl;
     private int numOfPagesToParse;
     private String className; // класс, содержащий в себе ссылкий на страницы
@@ -26,7 +26,7 @@ public class UserParserSetting extends StorageItem {
     private String storageId;
 
     @Builder
-    public UserParserSetting(
+    public ParsingPreset(
             String id,
             String name,
             List<String> tags,

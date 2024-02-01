@@ -3,8 +3,8 @@ package parser.app.webscraper.mappers.openapi;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import parser.app.webscraper.mappers.DateMapper;
-import parser.app.webscraper.models.UserParserSetting;
-import parser.userService.openapi.model.UserParserSettingsOpenApi;
+import parser.app.webscraper.models.ParsingPreset;
+import parser.userService.openapi.model.ParsingPresetDTO;
 
 import java.util.List;
 
@@ -14,22 +14,22 @@ import java.util.List;
                 ParserResultMapper.class,
                 ElementLocatorMapper.class,}
 )
-public interface UserParserSettingsMapper {
+public interface ParsingPresetMapper {
 
     @Mapping(source = "name", target = "name")
     @Mapping(source = "tags", target = "tags")
-    UserParserSetting toUserParseSetting(UserParserSettingsOpenApi userParserSettingsOpenApi);
+    ParsingPreset toUserParseSetting(ParsingPresetDTO parsingPresetDTO);
 
     @Mapping(source = "name", target = "name")
     @Mapping(source = "tags", target = "tags")
-    List<UserParserSetting> toUserParseSetting(List<UserParserSettingsOpenApi> userParserSettingsOpenApi);
+    List<ParsingPreset> toUserParseSetting(List<ParsingPresetDTO> parsingPresetDTO);
 
     @Mapping(source = "name", target = "name")
     @Mapping(source = "tags", target = "tags")
-    UserParserSettingsOpenApi toOpenApi(UserParserSetting userParserSetting);
+    ParsingPresetDTO toDTO(ParsingPreset parsingPreset);
 
     @Mapping(source = "name", target = "name")
     @Mapping(source = "tags", target = "tags")
-    List<UserParserSettingsOpenApi> toOpenApi(List<UserParserSetting> userParserSettingsOpenApi);
+    List<ParsingPresetDTO> toDTO(List<ParsingPreset> userParserSettingsDTO);
 
 }
