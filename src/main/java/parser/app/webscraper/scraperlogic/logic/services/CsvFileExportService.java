@@ -1,7 +1,8 @@
-package parser.app.webscraper.scraperlogic.logic.outputFile;
+package parser.app.webscraper.scraperlogic.logic.services;
 
 import com.opencsv.CSVWriter;
 import org.springframework.stereotype.Component;
+import parser.app.webscraper.scraperlogic.logic.services.interfaces.FileExportService;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class CsvFile implements ExportAlgorithm {
+public class CsvFileExportService implements FileExportService {
 
     @Override
     public void exportData(List<String> header, HashMap<String, List<String>> allPagesParseResult, String pathToOutput) {
@@ -29,8 +30,24 @@ public class CsvFile implements ExportAlgorithm {
         } while (outputFile == null);
 
         CSVWriter writer = new CSVWriter(outputFile, ';');
-        writer.writeNext(header.toArray(String[]::new));
+        fillHeader(writer, header);
+        writeData(writer, allPagesParseResult);
 
+        try {
+            writer.close();
+            outputFile.close();
+            System.out.println("Файл успешно сохранен по пути: " + pathToOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Ошибка при закрытии потоков записи.");
+        }
+    }
+
+    private void fillHeader(CSVWriter writer, List<String> header) {
+        writer.writeNext(header.toArray(String[]::new));
+    }
+
+    private void writeData(CSVWriter writer, HashMap<String, List<String>> allPagesParseResult) {
         int i = 0;
         for (Map.Entry<String, List<String>> entry : allPagesParseResult.entrySet()) {
             List<String> infoList = new ArrayList<>(entry.getValue());
