@@ -18,7 +18,7 @@ import java.util.Map;
 public class ExcelFileExportService implements FileExportService {
 
     @Override
-    public void exportData(List<String> header, HashMap<String, List<String>> allPagesParseResult, String pathToOutput) {
+    public void exportData(List<String> header, Map<String, List<String>> allPagesParseResult, String pathToOutput) {
         XSSFWorkbook excelFile = new XSSFWorkbook();
         XSSFSheet spreadsheet = excelFile.createSheet("Researchser");
         fillHeader(spreadsheet, header);

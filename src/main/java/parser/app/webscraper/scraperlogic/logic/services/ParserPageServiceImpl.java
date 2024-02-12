@@ -10,17 +10,23 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
 import parser.app.webscraper.models.ParsingPreset;
+import parser.app.webscraper.scraperlogic.logic.elementParser.ElementParser;
+import parser.app.webscraper.scraperlogic.logic.services.interfaces.PaginationService;
+import parser.app.webscraper.scraperlogic.logic.services.interfaces.ParserPageService;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Component
-public class PageService {
+public class ParserPageServiceImpl implements ParserPageService {
     private final PaginationService paginationService;
 
+    //todo: добавить обработку ошибок и логирование
     @Observed
+    @Override
     public List<String> getPagesToParseLinks(WebDriver driver, ParsingPreset parsingPreset) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10L));
         int numOfPagesToParse = parsingPreset.getNumOfPagesToParse();
@@ -69,5 +75,24 @@ public class PageService {
         System.out.println("Собрали все ссылки.");
         System.out.println(linksToPagesForParse);
         return linksToPagesForParse;
+    }
+
+    @Observed
+    @Override
+    public void collectDataFromPages(WebDriver driver, List<String> urls, List<ElementParser> elementParsers, Map<String, List<String>> allPagesParseResult) {
+        int parsePageNumber = 1;
+        for (String link : urls) {
+            System.out.printf("Парсим информацию со сыылки № %d", parsePageNumber);
+            System.out.println();
+            driver.get(link);
+            List<String> pageParseResult = new ArrayList<>();
+            for (ElementParser elementParser : elementParsers) {
+                pageParseResult.add(elementParser.parseByParameters());
+            }
+            allPagesParseResult.put(link, pageParseResult);
+            parsePageNumber++;
+        }
+        System.out.println("Парсинг закончен.");
+        driver.quit();
     }
 }

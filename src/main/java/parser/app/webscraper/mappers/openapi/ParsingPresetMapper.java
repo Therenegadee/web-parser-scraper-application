@@ -2,6 +2,7 @@ package parser.app.webscraper.mappers.openapi;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.context.annotation.ComponentScan;
 import parser.app.webscraper.mappers.DateMapper;
 import parser.app.webscraper.models.ParsingPreset;
 import parser.userService.openapi.model.ParsingPresetDTO;
@@ -14,6 +15,7 @@ import java.util.List;
                 ParserResultMapper.class,
                 ElementLocatorMapper.class,}
 )
+@ComponentScan(basePackages = "src/main/java/parser/app/webscraper/mappers")
 public interface ParsingPresetMapper {
 
     @Mapping(source = "name", target = "name")

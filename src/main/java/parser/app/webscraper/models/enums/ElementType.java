@@ -4,7 +4,8 @@ public enum ElementType {
     XPATH ("XPATH"),
     TAG_ATTR ("TAG_ATTR"),
     CSS ("CSS"),
-    COUNTABLE("Countable");
+    CLASS_NAME("CLASS_NAME"),
+    ID("ID");
 
     private final String value;
 

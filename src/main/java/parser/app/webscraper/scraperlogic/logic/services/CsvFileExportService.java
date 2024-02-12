@@ -16,7 +16,7 @@ import java.util.Map;
 public class CsvFileExportService implements FileExportService {
 
     @Override
-    public void exportData(List<String> header, HashMap<String, List<String>> allPagesParseResult, String pathToOutput) {
+    public void exportData(List<String> header, Map<String, List<String>> allPagesParseResult, String pathToOutput) {
         FileWriter outputFile = null;
         do {
             System.out.println("Введите путь к сохранению файла: ");
@@ -47,7 +47,7 @@ public class CsvFileExportService implements FileExportService {
         writer.writeNext(header.toArray(String[]::new));
     }
 
-    private void writeData(CSVWriter writer, HashMap<String, List<String>> allPagesParseResult) {
+    private void writeData(CSVWriter writer, Map<String, List<String>> allPagesParseResult) {
         int i = 0;
         for (Map.Entry<String, List<String>> entry : allPagesParseResult.entrySet()) {
             List<String> infoList = new ArrayList<>(entry.getValue());

@@ -15,6 +15,9 @@ public class ElementLocator {
     private String name;
     private ElementType type;
     private String pathToLocator;
-    private String extraPointer; // for Tag + Attribute
+    private String extraPointer; // attribute value (for Tag + Attribute)
     private String userParserSettingsId;
+    private boolean isCountable;
+    private ElementType countableElementType;
+    private String pathToCountableLocator;
 }
