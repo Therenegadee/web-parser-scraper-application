@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.context.annotation.ComponentScan;
 import parser.app.webscraper.mappers.DateMapper;
+import parser.app.webscraper.mappers.ObjectIdMapper;
 import parser.app.webscraper.models.ParsingPreset;
 import parser.userService.openapi.model.ParsingPresetDTO;
 
@@ -13,18 +14,20 @@ import java.util.List;
         componentModel = "spring",
         uses = {DateMapper.class,
                 ParserResultMapper.class,
-                ElementLocatorMapper.class,}
+                ElementLocatorMapper.class,
+                ObjectIdMapper.class
+        }
 )
 @ComponentScan(basePackages = "src/main/java/parser/app/webscraper/mappers")
 public interface ParsingPresetMapper {
 
     @Mapping(source = "name", target = "name")
     @Mapping(source = "tags", target = "tags")
-    ParsingPreset toUserParseSetting(ParsingPresetDTO parsingPresetDTO);
+    ParsingPreset toParsingPreset(ParsingPresetDTO parsingPresetDTO);
 
     @Mapping(source = "name", target = "name")
     @Mapping(source = "tags", target = "tags")
-    List<ParsingPreset> toUserParseSetting(List<ParsingPresetDTO> parsingPresetDTO);
+    List<ParsingPreset> toParsingPreset(List<ParsingPresetDTO> parsingPresetDTO);
 
     @Mapping(source = "name", target = "name")
     @Mapping(source = "tags", target = "tags")

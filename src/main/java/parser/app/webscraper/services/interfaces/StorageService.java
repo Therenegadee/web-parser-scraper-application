@@ -1,7 +1,8 @@
 package parser.app.webscraper.services.interfaces;
 
+import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
-import parser.userService.openapi.model.FolderDTO;
+import parser.app.webscraper.models.Storage;
 import parser.userService.openapi.model.StorageDTO;
 
 
@@ -9,9 +10,11 @@ public interface StorageService {
 
     ResponseEntity<Void> createStorage(Long userId);
 
-    StorageDTO findByStorageId(String storageId);
+    Storage findByStorageId(ObjectId storageId);
 
-    StorageDTO findByUserId(Long userId);
+    Storage findByUserId(Long userId);
+
+    Storage save(Storage storage);
 
     ResponseEntity<Void> updateStorageById(String storageId, StorageDTO storageDTO);
 

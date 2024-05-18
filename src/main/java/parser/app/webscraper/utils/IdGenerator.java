@@ -1,11 +1,9 @@
 package parser.app.webscraper.utils;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.stereotype.Service;
 import parser.app.webscraper.models.StorageItem;
 
 import java.lang.reflect.Field;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service

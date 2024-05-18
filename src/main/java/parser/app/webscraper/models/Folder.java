@@ -5,8 +5,8 @@ import io.micrometer.observation.annotation.Observed;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
-import parser.app.webscraper.utils.IdGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +17,9 @@ import java.util.Optional;
 @Setter
 @Component
 public class Folder extends StorageItem {
-    private String storageId;
+    private ObjectId storageId;
     @Nullable
-    private String parentFolderId;
+    private ObjectId parentFolderId;
     private List<StorageItem> folderItems;
 
     public Folder() {
@@ -28,33 +28,30 @@ public class Folder extends StorageItem {
 
     @Builder
     public Folder(
-            String id,
+            ObjectId id,
             String name,
             List<String> tags,
-            String storageId,
-            String parentFolderId,
+            ObjectId storageId,
+            @Nullable ObjectId parentFolderId,
             List<StorageItem> folderItems
     ) {
-        super(id,name, tags);
+        super(id, name, tags);
         this.storageId = storageId;
         this.parentFolderId = parentFolderId;
-        if (Objects.isNull(folderItems)) {
-            this.folderItems = new ArrayList<>();
-        }
         this.folderItems = folderItems;
     }
 
-    public final void addStorageItem(StorageItem storageItem) {
-        if(Objects.isNull(storageItem.getId())) {
-            storageItem.setId(IdGenerator.generateId(storageItem));
+    public final void addFolderItem(StorageItem storageItem) {
+        if (Objects.isNull(storageItem.getId())) {
+            storageItem.setId(ObjectId.get());
         }
         this.folderItems.add(storageItem);
     }
 
     @Observed
-    public final Optional<ParsingPreset> findParserSettingsById(String settingsId) {
+    public final Optional<ParsingPreset> findParserSettingsById(ObjectId settingsId) {
         for (StorageItem item : this.folderItems) {
-            if (item instanceof ParsingPreset && ((ParsingPreset) item).getId().equals(settingsId)) {
+            if (item instanceof ParsingPreset && item.getId().equals(settingsId)) {
                 return Optional.of((ParsingPreset) item);
             } else if (item instanceof Folder) {
                 Optional<ParsingPreset> result = ((Folder) item).findParserSettingsById(settingsId);
@@ -67,10 +64,10 @@ public class Folder extends StorageItem {
     }
 
     @Observed
-    public final Optional<Folder> findFolderById(String folderId) {
+    public final Optional<Folder> findFolderById(ObjectId folderId) {
         for (StorageItem item : this.folderItems) {
             if (item instanceof Folder) {
-                if (((Folder) item).getId().equals(folderId)) {
+                if (item.getId().equals(folderId)) {
                     return Optional.of((Folder) item);
                 }
                 Optional<Folder> result = ((Folder) item).findFolderById(folderId);
@@ -83,7 +80,7 @@ public class Folder extends StorageItem {
     }
 
     @Observed
-    public final Optional<Folder[]> findFolderWithParentFolder(String folderId) {
+    public final Optional<Folder[]> findFolderWithParentFolder(ObjectId folderId) {
         for(StorageItem item : this.folderItems) {
             if (item instanceof Folder) {
                 if (item.getId().equals(folderId)) {

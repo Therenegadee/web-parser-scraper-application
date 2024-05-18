@@ -2,13 +2,14 @@ package parser.app.webscraper.mappers.openapi;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import parser.app.webscraper.mappers.ObjectIdMapper;
 import parser.app.webscraper.models.Folder;
 import parser.userService.openapi.model.FolderDTO;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring",
-        uses = {StorageItemMapper.class})
+        uses = {StorageItemMapper.class, ObjectIdMapper.class})
 public interface FolderMapper {
 
     @Mapping(source = "name", target = "name")

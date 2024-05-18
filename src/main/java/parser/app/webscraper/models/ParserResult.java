@@ -1,12 +1,12 @@
 package parser.app.webscraper.models;
 
 import lombok.*;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.stereotype.Component;
 import parser.app.webscraper.scraperlogic.logic.outputFile.OutputFileType;
 
 import java.util.Date;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -20,5 +20,5 @@ public class ParserResult {
     private Date date;
     private String linkToDownloadResults;
     private OutputFileType outputFileType;
-    private String userParserSettingsId;
+    private ObjectId presetId;
 }

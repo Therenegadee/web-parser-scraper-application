@@ -1,6 +1,5 @@
 package parser.app.webscraper.scraperlogic.logic.elementParser;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.openqa.selenium.By;

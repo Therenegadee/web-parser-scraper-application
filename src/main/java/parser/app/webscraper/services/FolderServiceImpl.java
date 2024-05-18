@@ -2,14 +2,15 @@ package parser.app.webscraper.services;
 
 import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import parser.app.webscraper.DAO.StorageMongoTemplate;
 import parser.app.webscraper.exceptions.NotFoundException;
 import parser.app.webscraper.mappers.openapi.FolderMapper;
 import parser.app.webscraper.models.Folder;
 import parser.app.webscraper.models.Storage;
-import parser.app.webscraper.repository.StorageRepository;
 import parser.app.webscraper.services.interfaces.FolderService;
 import parser.userService.openapi.model.FolderDTO;
 
@@ -19,7 +20,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class FolderServiceImpl implements FolderService {
     private final FolderMapper folderMapper;
-    private final StorageRepository storageRepository;
+    private final StorageMongoTemplate storageRepository;
 
     @Observed
     @Transactional
@@ -29,7 +30,7 @@ public class FolderServiceImpl implements FolderService {
         Storage storage = storageRepository
                 .findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException(String.format(String.format("Storage for user with id %s wasn't found", userId))));
-        String parentId = folder.getParentFolderId();
+        ObjectId parentId = folder.getParentFolderId();
         if (Objects.isNull(parentId)) {
             storage.addStorageItem(folder);
         } else {
@@ -45,7 +46,7 @@ public class FolderServiceImpl implements FolderService {
     @Observed
     @Transactional
     @Override
-    public FolderDTO findFolderById(String storageId, String folderId) {
+    public FolderDTO findFolderById(ObjectId storageId, ObjectId folderId) {
         Storage storage = storageRepository
                 .findById(storageId)
                 .orElseThrow(() -> new NotFoundException(String.format("Storage with id %s wasn't found", storageId)));
@@ -58,7 +59,7 @@ public class FolderServiceImpl implements FolderService {
     @Observed
     @Transactional
     @Override
-    public ResponseEntity<Void> updateFolderById(String storageId, String folderId, FolderDTO folderDTO) {
+    public ResponseEntity<Void> updateFolderById(ObjectId storageId, ObjectId folderId, FolderDTO folderDTO) {
         Folder sourceFolder = folderMapper.toFolder(folderDTO);
         Storage storage = storageRepository
                 .findById(storageId)
@@ -67,7 +68,7 @@ public class FolderServiceImpl implements FolderService {
         Folder targetFolder = storage.findFolderById(folderId)
                 .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", folderId, storageId)));
 
-        if (!targetFolder.getParentFolderId().equals(sourceFolder.getParentFolderId())) {
+        if (!Objects.equals(targetFolder.getParentFolderId(), sourceFolder.getParentFolderId())) {
             Folder targetParentFolder = storage.findFolderById(targetFolder.getParentFolderId())
                     .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", folderId, storageId)));
             targetParentFolder.getFolderItems().remove(targetFolder);
@@ -77,7 +78,7 @@ public class FolderServiceImpl implements FolderService {
                 Folder sourceParentFolder = storage
                         .findFolderById(sourceFolder.getParentFolderId())
                         .orElseThrow(() -> new NotFoundException(String.format("Folder with id %s in storage (id: %s) wasn't found", folderId, storageId)));
-                sourceParentFolder.addStorageItem(targetFolder);
+                sourceParentFolder.addFolderItem(targetFolder);
             }
         }
 
@@ -95,7 +96,7 @@ public class FolderServiceImpl implements FolderService {
     @Observed
     @Transactional
     @Override
-    public ResponseEntity<Void> deleteFolderById(String storageId, String folderId) {
+    public ResponseEntity<Void> deleteFolderById(ObjectId storageId, ObjectId folderId) {
         Storage storage = storageRepository
                 .findById(storageId)
                 .orElseThrow(() -> new NotFoundException(String.format("Storage with id %s wasn't found", storageId)));
@@ -109,7 +110,6 @@ public class FolderServiceImpl implements FolderService {
             storage.getStorageItems().remove(folderWithParentFolder[1]);
         }
         storageRepository.save(storage);
-
         return ResponseEntity
                 .ok()
                 .build();

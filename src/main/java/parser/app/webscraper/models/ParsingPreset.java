@@ -3,6 +3,7 @@ package parser.app.webscraper.models;
 
 import com.mongodb.lang.Nullable;
 import lombok.*;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,12 +23,12 @@ public class ParsingPreset extends StorageItem {
     private List<ElementLocator> elementLocators;
     private List<ParserResult> parsingHistory;
     @Nullable
-    private String parentFolderId;
+    private ObjectId parentFolderId;
     private String storageId;
 
     @Builder
     public ParsingPreset(
-            String id,
+            ObjectId id,
             String name,
             List<String> tags,
             int numOfPagesToParse,
@@ -37,7 +38,7 @@ public class ParsingPreset extends StorageItem {
             List<String> header,
             List<ElementLocator> elementLocators,
             List<ParserResult> parsingHistory,
-            String parentFolderId,
+            ObjectId parentFolderId,
             String storageId
     ) {
         super(id, name, tags);

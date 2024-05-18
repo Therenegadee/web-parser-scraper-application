@@ -1,6 +1,7 @@
 package parser.app.webscraper.mappers.openapi;
 
 import org.mapstruct.Mapper;
+import parser.app.webscraper.mappers.ObjectIdMapper;
 import parser.app.webscraper.models.Folder;
 import parser.app.webscraper.models.ParsingPreset;
 import parser.app.webscraper.models.StorageItem;
@@ -15,9 +16,11 @@ import java.util.stream.Collectors;
         FolderMapper.class,
         StorageMapper.class,
         ParsingPresetMapper.class,
-})
+        ObjectIdMapper.class
+    }
+)
 public interface StorageItemMapper {
-    default StorageItem toStorageItem(StorageItemDTO storageItemOpenApi){
+    default StorageItem toStorageItem(StorageItemDTO storageItemOpenApi) {
         if (storageItemOpenApi instanceof FolderDTO) {
             return toFolder(storageItemOpenApi);
         } else if (storageItemOpenApi instanceof ParsingPresetDTO) {
@@ -25,7 +28,7 @@ public interface StorageItemMapper {
         } else return null;
     }
 
-    default List<StorageItem> toStorageItem(List<StorageItemDTO> storageItemOpenApi){
+    default List<StorageItem> toStorageItem(List<StorageItemDTO> storageItemOpenApi) {
         return storageItemOpenApi.stream()
                 .map(this::toStorageItem)
                 .collect(Collectors.toList());

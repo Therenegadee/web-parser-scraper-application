@@ -1,6 +1,5 @@
 package parser.app.webscraper.scraperlogic.logic.elementParser;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.openqa.selenium.By;
@@ -50,5 +49,4 @@ public class XPathElementParser implements ParseAlgorithm {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xPath)));
         return driver.findElements(By.xpath(xPath));
     }
-
 }

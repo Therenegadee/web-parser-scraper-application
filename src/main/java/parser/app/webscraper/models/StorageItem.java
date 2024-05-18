@@ -1,6 +1,10 @@
 package parser.app.webscraper.models;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
 import java.util.List;
@@ -11,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public abstract class StorageItem {
     @Id
-    private String id;
+    private ObjectId id;
     private String name;
     private List<String> tags;
 }

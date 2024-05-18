@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parser.app.webscraper.config.ParserConfiguration;
 import parser.app.webscraper.models.ElementLocator;
+import parser.app.webscraper.models.ParserResult;
 import parser.app.webscraper.models.ParsingPreset;
 import parser.app.webscraper.scraperlogic.logic.elementParser.ElementParser;
 import parser.app.webscraper.scraperlogic.logic.outputFile.OutputFileType;
@@ -30,8 +31,7 @@ public class ParserRunner {
     private final HashMap<String, List<String>> allPagesParseResult = new HashMap<>();
 
     @Observed
-    //todo: добавить историю
-    public String runParser(ParsingPreset parsingPreset) {
+    public String runParser(ParsingPreset parsingPreset, ParserResult parserResult) {
         WebDriver driver = new ChromeDriver(chromeOptions);
         String firstPageURL = parsingPreset.getFirstPageUrl(); // https://zhongchou.modian.com/all/top_comment/all/1
         driver.get(firstPageURL);
@@ -43,8 +43,7 @@ public class ParserRunner {
         List<String> urls = parserPageService.getPagesToParseLinks(driver, parsingPreset);
         parserPageService.collectDataFromPages(driver, urls, elementParsers, allPagesParseResult);
 
-        //todo: фиксануть этот выбор типа файла
-        OutputFileType fileType = parsingPreset.getParsingHistory().get(0).getOutputFileType();
+        OutputFileType fileType = parserResult.getOutputFileType();
         String outPutFilePath = fileSaveService.saveFile(fileType, parsingPreset.getHeader(), allPagesParseResult);
         return outPutFilePath;
     }
