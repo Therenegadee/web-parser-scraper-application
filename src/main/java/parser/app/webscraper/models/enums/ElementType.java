@@ -1,7 +1,6 @@
 package parser.app.webscraper.models.enums;
 
 public enum ElementType {
-    XPATH ("XPATH"),
     TAG_ATTR ("TAG_ATTR"),
     CSS ("CSS"),
     CLASS_NAME("CLASS_NAME"),

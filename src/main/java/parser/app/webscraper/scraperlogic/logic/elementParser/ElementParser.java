@@ -2,10 +2,13 @@ package parser.app.webscraper.scraperlogic.logic.elementParser;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.openqa.selenium.WebDriver;
+import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.spel.InternalParseException;
 import parser.app.webscraper.models.ElementLocator;
 import parser.app.webscraper.scraperlogic.logic.elementParser.interfaces.ParseAlgorithm;
+
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -15,18 +18,17 @@ public class ElementParser {
     private final ElementLocator parseElementDetails;
 
     @Autowired
-    public ElementParser(WebDriver driver, ElementLocator elementLocator) {
+    public ElementParser(ElementLocator elementLocator) {
         this.parseElementDetails = elementLocator;
         this.parseAlgorithm = switch (elementLocator.getType()) {
-            case XPATH -> new XPathElementParser(driver);
-            case CSS -> new CssSelectorElementParser(driver);
-            case TAG_ATTR -> new TagAttrElementParser(driver);
-            case ID -> new IdElementParser(driver);
-            case CLASS_NAME -> new ClassnameElementParser(driver);
+            case CSS -> new CssSelectorElementParser();
+            case TAG_ATTR -> new TagAttrElementParser();
+            case ID -> new IdElementParser();
+            case CLASS_NAME -> new ClassnameElementParser();
         };
     }
 
-    public String parseByParameters() {
-        return parseAlgorithm.parseByParameters(parseElementDetails);
+    public String parseByParameters(Document page) {
+        return parseAlgorithm.parseByParameters(page, parseElementDetails);
     }
 }

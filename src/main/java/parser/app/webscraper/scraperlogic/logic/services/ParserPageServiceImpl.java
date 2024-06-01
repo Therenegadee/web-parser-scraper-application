@@ -2,97 +2,95 @@ package parser.app.webscraper.scraperlogic.logic.services;
 
 import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
-import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import parser.app.webscraper.models.ParsingPreset;
 import parser.app.webscraper.scraperlogic.logic.elementParser.ElementParser;
-import parser.app.webscraper.scraperlogic.logic.services.interfaces.PaginationService;
 import parser.app.webscraper.scraperlogic.logic.services.interfaces.ParserPageService;
 
-import java.time.Duration;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Component
 public class ParserPageServiceImpl implements ParserPageService {
-    private final PaginationService paginationService;
 
     //todo: добавить обработку ошибок и логирование
     @Observed
     @Override
-    public List<String> getPagesToParseLinks(WebDriver driver, ParsingPreset parsingPreset) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10L));
+    public List<String> getPagesToParseLinks(ParsingPreset parsingPreset) {
+        Document page; // https://zhongchou.modian.com/all/top_comment/all/1
+        try {
+            page = Jsoup.connect(parsingPreset.getFirstPageUrl()).get();
+        } catch (IOException e) {
+            String msg = "Error occurred while connecting to the first page URL: %s. Document object wasn't initialized.";
+            throw new IllegalArgumentException(String.format(msg, parsingPreset.getFirstPageUrl()));
+        }
         int numOfPagesToParse = parsingPreset.getNumOfPagesToParse();
         List<String> linksToPagesForParse = new ArrayList<>();
         String className = parsingPreset.getClassName(); // pc_ga_pro_index_17
         String tagName = parsingPreset.getTagName(); // a
         if (numOfPagesToParse <= 0) {
-            System.err.println("Неверный ввод. Введите число в диапазоне от 1 до n");
-        } else if (numOfPagesToParse == 1) {
-            System.out.printf("Собираем ссылки со страницы %d...", 1);
-            List<WebElement> webElementList = driver.findElements(By.className(className));
-            for (WebElement element : webElementList) {
-                try {
-                    WebElement linkElement = element.findElement(By.tagName(tagName));
-                    String href = linkElement.getAttribute("href");
-                    if (href != null && !href.isEmpty()) {
+            String msg = "Number of pages to parse couldn't be less or equals to 0. The given value is: %d";
+            throw new IllegalArgumentException(String.format(msg, numOfPagesToParse));
+        } else if (Objects.nonNull(page)) {
+            for (int i = 0; i < numOfPagesToParse; ) {
+                System.out.printf("[%d page of %d] Collecting links from web-page URL: %s", i, numOfPagesToParse, page.location());
+                Elements elements = page.getElementsByClass(className);
+                for (Element element : elements) {
+                    Element linkElement = element.getElementsByTag(tagName).first();
+                    String href = linkElement.getElementsByAttribute("href").first().text();
+                    if (Objects.nonNull(href) && !href.isEmpty()) {
                         linksToPagesForParse.add(href);
                     }
-                } catch (StaleElementReferenceException ex) {
-                    System.out.println(ex.getMessage());
                 }
-            }
-        } else if (numOfPagesToParse > 1) {
-            System.out.println("Введите CSS Selector путь кнопки переключения следующей страницы: ");
-            String cssSelectorNextPage = parsingPreset.getCssSelectorNextPage(); // body > div > div.pro_field > div > div > a.next
-            for (int i = 1; i <= numOfPagesToParse; i++) {
-                System.out.printf("Собираем ссылки со страницы %d...", i);
-                System.out.println();
-                wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(className)));
-                List<WebElement> webElementList = driver.findElements(By.className(className));
-                for (WebElement element : webElementList) {
+                if (numOfPagesToParse > 1) {
                     try {
-                        WebElement linkElement = element.findElement(By.tagName(tagName));
-                        String href = linkElement.getAttribute("href");
-                        if (href != null && !href.isEmpty()) {
-                            linksToPagesForParse.add(href);
-                        }
-                    } catch (StaleElementReferenceException ex) {
-                        System.out.println(ex.getMessage());
+                        page = getNextPage(page, parsingPreset.getCssSelectorNextPage()); // body > div > div.pro_field > div > div > a.next
+                    } catch (IOException e) {
+                        System.err.println("Error occurred while moving to the next page.");
+                        // TODO: add to error links
+                        //  and try to add the repeatable tries to connect to the next page
                     }
                 }
-                webElementList.clear();
-                paginationService.clickNextPageButton(driver, cssSelectorNextPage);
+                i++;
             }
         }
-        System.out.println("Собрали все ссылки.");
-        System.out.println(linksToPagesForParse);
+        System.out.println("All links were collected.");
         return linksToPagesForParse;
     }
 
     @Observed
     @Override
-    public void collectDataFromPages(WebDriver driver, List<String> urls, List<ElementParser> elementParsers, Map<String, List<String>> allPagesParseResult) {
-        int parsePageNumber = 1;
+    public void collectDataFromPages(List<String> urls, List<ElementParser> elementParsers, Map<String, List<String>> allPagesParseResult) {
+        Document page;
         for (String link : urls) {
-            System.out.printf("Парсим информацию со сыылки № %d", parsePageNumber);
-            System.out.println();
-            driver.get(link);
+            System.out.printf("Collecting data from page URL: %s", link);
+            try {
+                page = Jsoup.connect(link).get();
+            } catch (IOException e) {
+                System.err.printf("Error occurred while connecting to page URL: %s.", link);
+                // TODO: add to error links
+                continue;
+            }
             List<String> pageParseResult = new ArrayList<>();
             for (ElementParser elementParser : elementParsers) {
-                pageParseResult.add(elementParser.parseByParameters());
+                pageParseResult.add(elementParser.parseByParameters(page));
             }
             allPagesParseResult.put(link, pageParseResult);
-            parsePageNumber++;
         }
-        System.out.println("Парсинг закончен.");
-        driver.quit();
+        System.out.println("Finished collecting the data.");
+    }
+
+    @Observed
+    private Document getNextPage(Document page, String cssSelectorNextPage) throws IOException {
+        String nextPageLink = page.select(cssSelectorNextPage).first().getElementsByAttribute("href").text();
+        return Jsoup.connect(nextPageLink).get();
     }
 }
