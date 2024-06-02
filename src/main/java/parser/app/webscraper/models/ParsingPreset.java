@@ -38,7 +38,7 @@ public class ParsingPreset extends StorageItem {
             List<String> header,
             List<ElementLocator> elementLocators,
             List<ParserResult> parsingHistory,
-            ObjectId parentFolderId,
+            @Nullable ObjectId parentFolderId,
             String storageId
     ) {
         super(id, name, tags);

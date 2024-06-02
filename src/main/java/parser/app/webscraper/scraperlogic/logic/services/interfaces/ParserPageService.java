@@ -1,7 +1,7 @@
 package parser.app.webscraper.scraperlogic.logic.services.interfaces;
 
 import parser.app.webscraper.models.ParsingPreset;
-import parser.app.webscraper.scraperlogic.logic.elementParser.ElementParser;
+import parser.app.webscraper.scraperlogic.logic.elements.ElementParser;
 
 import java.util.List;
 import java.util.Map;

@@ -2,12 +2,11 @@ package parser.app.webscraper.scraperlogic;
 
 import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
-import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 import parser.app.webscraper.models.ElementLocator;
 import parser.app.webscraper.models.ParserResult;
 import parser.app.webscraper.models.ParsingPreset;
-import parser.app.webscraper.scraperlogic.logic.elementParser.ElementParser;
+import parser.app.webscraper.scraperlogic.logic.elements.ElementParser;
 import parser.app.webscraper.scraperlogic.logic.outputFile.OutputFileType;
 import parser.app.webscraper.scraperlogic.logic.services.interfaces.FileSaveService;
 import parser.app.webscraper.scraperlogic.logic.services.interfaces.ParserPageService;

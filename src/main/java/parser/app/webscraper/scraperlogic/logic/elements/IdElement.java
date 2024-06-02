@@ -1,4 +1,4 @@
-package parser.app.webscraper.scraperlogic.logic.elementParser;
+package parser.app.webscraper.scraperlogic.logic.elements;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,26 +7,22 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import parser.app.webscraper.models.ElementLocator;
-import parser.app.webscraper.scraperlogic.logic.elementParser.interfaces.ParseAlgorithm;
+import parser.app.webscraper.scraperlogic.logic.elements.interfaces.ParseableElement;
 
 import java.util.Collections;
 
 @Getter
 @Setter
-public class IdElementParser implements ParseAlgorithm {
+public class IdElement implements ParseableElement {
 
     @Autowired
-    public IdElementParser() {
+    public IdElement() {
 
     }
 
     @Override
     public String parseByParameters(Document page, ElementLocator parseElementDetails) {
-        Element webElement = parseByParametersWithWebElementInfo(page, parseElementDetails);
-        if (parseElementDetails.isCountable()) {
-            return String.valueOf(getCountableElements(webElement, parseElementDetails).size());
-        }
-        return webElement.text();
+        return parseByParametersWithWebElementInfo(page, parseElementDetails).text();
     }
 
     @Override

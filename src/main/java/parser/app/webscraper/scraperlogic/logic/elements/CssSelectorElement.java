@@ -1,4 +1,4 @@
-package parser.app.webscraper.scraperlogic.logic.elementParser;
+package parser.app.webscraper.scraperlogic.logic.elements;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,14 +7,15 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import parser.app.webscraper.models.ElementLocator;
-import parser.app.webscraper.scraperlogic.logic.elementParser.interfaces.ParseAlgorithm;
+import parser.app.webscraper.scraperlogic.logic.elements.interfaces.CountableElement;
+import parser.app.webscraper.scraperlogic.logic.elements.interfaces.ParseableElement;
 
 @Getter
 @Setter
-public class CssSelectorElementParser implements ParseAlgorithm {
+public class CssSelectorElement implements ParseableElement, CountableElement {
 
     @Autowired
-    public CssSelectorElementParser() {
+    public CssSelectorElement() {
 
     }
 
@@ -35,5 +36,10 @@ public class CssSelectorElementParser implements ParseAlgorithm {
     @Override
     public Elements parseByParametersWithAllWebElementsInfo(Document page, ElementLocator parseElementDetails) {
         return page.select(parseElementDetails.getPathToLocator());
+    }
+
+    @Override
+    public Elements getCountableElements(Element webElement, ElementLocator parseElementDetails) {
+        return webElement.select(parseElementDetails.getPathToCountableLocator());
     }
 }

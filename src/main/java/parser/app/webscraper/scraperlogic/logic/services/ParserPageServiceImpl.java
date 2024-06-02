@@ -8,7 +8,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import parser.app.webscraper.models.ParsingPreset;
-import parser.app.webscraper.scraperlogic.logic.elementParser.ElementParser;
+import parser.app.webscraper.scraperlogic.logic.elements.ElementParser;
 import parser.app.webscraper.scraperlogic.logic.services.interfaces.ParserPageService;
 
 import java.io.IOException;
