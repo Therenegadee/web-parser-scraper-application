@@ -4,7 +4,7 @@ import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import parser.app.webscraper.models.ElementLocator;
-import parser.app.webscraper.models.ParserResult;
+import parser.app.webscraper.models.ParsingResult;
 import parser.app.webscraper.models.ParsingPreset;
 import parser.app.webscraper.scraperlogic.logic.elements.ElementParser;
 import parser.app.webscraper.scraperlogic.logic.outputFile.OutputFileType;
@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ParserRunner {
+public class ParserExecutor {
 
     private final ParserPageService parserPageService;
     private final FileSaveService fileSaveService;
@@ -25,7 +25,7 @@ public class ParserRunner {
     private final HashMap<String, List<String>> allPagesParseResult = new HashMap<>();
 
     @Observed
-    public String runParser(ParsingPreset parsingPreset, ParserResult parserResult) {
+    public String runParser(ParsingPreset parsingPreset, ParsingResult parsingResult) {
         for (ElementLocator e : parsingPreset.getElementLocators()) {
             elementParsers.add(new ElementParser(e));
         }
@@ -33,7 +33,7 @@ public class ParserRunner {
         List<String> urls = parserPageService.getPagesToParseLinks(parsingPreset);
         parserPageService.collectDataFromPages(urls, elementParsers, allPagesParseResult);
 
-        OutputFileType fileType = parserResult.getOutputFileType();
+        OutputFileType fileType = parsingResult.getOutputFileType();
         String outPutFilePath = fileSaveService.saveFile(fileType, parsingPreset.getHeader(), allPagesParseResult);
         return outPutFilePath;
     }

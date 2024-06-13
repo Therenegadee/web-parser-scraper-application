@@ -21,7 +21,7 @@ public class ParsingPreset extends StorageItem {
     private String cssSelectorNextPage; // CSS Selector кнопки переключения страниц
     private List<String> header;
     private List<ElementLocator> elementLocators;
-    private List<ParserResult> parsingHistory;
+    private List<ParsingResult> parsingHistory;
     @Nullable
     private ObjectId parentFolderId;
     private String storageId;
@@ -37,7 +37,7 @@ public class ParsingPreset extends StorageItem {
             String cssSelectorNextPage,
             List<String> header,
             List<ElementLocator> elementLocators,
-            List<ParserResult> parsingHistory,
+            List<ParsingResult> parsingHistory,
             @Nullable ObjectId parentFolderId,
             String storageId
     ) {
@@ -54,7 +54,7 @@ public class ParsingPreset extends StorageItem {
     }
 
 
-    public void addParserResult(ParserResult parserResult) {
-        parsingHistory.add(parserResult);
+    public void addParserResult(ParsingResult parsingResult) {
+        parsingHistory.add(parsingResult);
     }
 }

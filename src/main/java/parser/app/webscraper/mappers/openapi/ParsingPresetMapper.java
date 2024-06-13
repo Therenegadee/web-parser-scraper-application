@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper(
         componentModel = "spring",
         uses = {DateMapper.class,
-                ParserResultMapper.class,
+                ParsingResultMapper.class,
                 ElementLocatorMapper.class,
                 ObjectIdMapper.class
         }

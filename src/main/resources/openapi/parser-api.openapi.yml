@@ -476,13 +476,13 @@ components:
             parsingHistory:
               type: array
               items:
-                $ref: '#/components/schemas/ParserResultDTO'
+                $ref: '#/components/schemas/ParsingResultDTO'
             parentFolderId:
               type: string
 #              format: uuid
 
 
-    ParserResultDTO:
+    ParsingResultDTO:
       type: object
       required:
         - date
@@ -601,8 +601,8 @@ components:
       properties:
         parsingPreset:
           $ref: '#/components/schemas/ParsingPresetDTO'
-        parserResult:
-          $ref: '#/components/schemas/ParserResultDTO'
+        parsingResult:
+          $ref: '#/components/schemas/ParsingResultDTO'
       required:
         - parsingPreset
-        - parserResult
+        - parsingResult

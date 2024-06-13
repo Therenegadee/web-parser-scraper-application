@@ -14,7 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Component
-public class ParserResult {
+public class ParsingResult {
     @Id
     private Long id;
     private Date date;

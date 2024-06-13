@@ -9,13 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import parser.app.webscraper.exceptions.NotFoundException;
-import parser.app.webscraper.mappers.openapi.ParserResultMapper;
+import parser.app.webscraper.mappers.openapi.ParsingResultMapper;
 import parser.app.webscraper.mappers.openapi.ParsingPresetMapper;
 import parser.app.webscraper.models.*;
 import parser.app.webscraper.services.interfaces.ParserService;
 import parser.app.webscraper.services.interfaces.StorageService;
-import parser.userService.openapi.model.ParserResultDTO;
 import parser.userService.openapi.model.ParsingPresetDTO;
+import parser.userService.openapi.model.ParsingResultDTO;
 
 import java.util.Optional;
 
@@ -25,7 +25,7 @@ import java.util.Optional;
 public class ParserServiceImpl implements ParserService {
 
     private final StorageService storageService;
-    private final ParserResultMapper parserResultMapper;
+    private final ParsingResultMapper parsingResultMapper;
     private final ParsingPresetMapper parsingPresetMapper;
 
     @Override
@@ -63,15 +63,15 @@ public class ParserServiceImpl implements ParserService {
     @Observed
     @Transactional
     @Override
-    public ResponseEntity<Void> runParser(ParsingPresetDTO parsingPresetDTO, ParserResultDTO parserResultDTO) {
-        ParserResult parserResult = parserResultMapper.toParserResult(parserResultDTO);
+    public ResponseEntity<Void> runParser(ParsingPresetDTO parsingPresetDTO, ParsingResultDTO parserResultDTO) {
+        ParsingResult parsingResult = parsingResultMapper.toParserResult(parserResultDTO);
         ParsingPreset parsingPreset = parsingPresetMapper.toParsingPreset(parsingPresetDTO);
         //todo: прописать логику запуска парсера
 
         //TODO: добавить файл сервис и ссылку на скачивание
 
-        parserResult.setLinkToDownloadResults("");
-        parsingPreset.addParserResult(parserResult);
+        parsingResult.setLinkToDownloadResults("");
+        parsingPreset.addParserResult(parsingResult);
         return ResponseEntity
                 .ok()
                 .build();

@@ -53,7 +53,7 @@ public class ParserController implements ParserApiDelegate {
     @Override
     @PostMapping("/preset/{presetId}")
     public ResponseEntity<Void> runParser(@PathVariable("presetId") String presetId, @RequestBody RunParserRequest request) {
-        return parserService.runParser(request.getParsingPreset(), request.getParserResult());
+        return parserService.runParser(request.getParsingPreset(), request.getParsingResult());
     }
 
     @Observed
