@@ -9,17 +9,14 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import parser.app.webscraper.models.ParsingPreset;
 import parser.app.webscraper.scraperlogic.logic.elements.ElementParser;
-import parser.app.webscraper.scraperlogic.logic.services.interfaces.ParserPageService;
+import parser.app.webscraper.scraperlogic.logic.services.interfaces.UrlParserService;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Component
-public class ParserPageServiceImpl implements ParserPageService {
+public class UrlParserServiceImpl implements UrlParserService {
 
     //todo: добавить обработку ошибок и логирование
     @Observed
@@ -68,24 +65,21 @@ public class ParserPageServiceImpl implements ParserPageService {
 
     @Observed
     @Override
-    public void collectDataFromPages(List<String> urls, List<ElementParser> elementParsers, Map<String, List<String>> allPagesParseResult) {
+    public List<String> collectDataFromPage(String url, List<ElementParser> elementParsers) {
         Document page;
-        for (String link : urls) {
-            System.out.printf("Collecting data from page URL: %s", link);
-            try {
-                page = Jsoup.connect(link).get();
-            } catch (IOException e) {
-                System.err.printf("Error occurred while connecting to page URL: %s.", link);
-                // TODO: add to error links
-                continue;
-            }
-            List<String> pageParseResult = new ArrayList<>();
-            for (ElementParser elementParser : elementParsers) {
-                pageParseResult.add(elementParser.parseByParameters(page));
-            }
-            allPagesParseResult.put(link, pageParseResult);
+        System.out.printf("Collecting data from page URL: %s", url);
+        try {
+            page = Jsoup.connect(url).get();
+        } catch (IOException e) {
+            System.err.printf("Error occurred while connecting to page URL: %s.", url);
+            // TODO: add to error links
+            return null;
         }
-        System.out.println("Finished collecting the data.");
+        List<String> pageParseResult = new ArrayList<>();
+        for (ElementParser elementParser : elementParsers) {
+            pageParseResult.add(elementParser.parseByParameters(page));
+        }
+        return pageParseResult;
     }
 
     @Observed

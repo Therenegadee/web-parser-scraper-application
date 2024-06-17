@@ -4,11 +4,10 @@ import parser.app.webscraper.models.ParsingPreset;
 import parser.app.webscraper.scraperlogic.logic.elements.ElementParser;
 
 import java.util.List;
-import java.util.Map;
 
-public interface ParserPageService {
+public interface UrlParserService {
 
     List<String> getPagesToParseLinks(ParsingPreset parsingPreset);
 
-    void collectDataFromPages(List<String> urls, List<ElementParser> elementParsers, Map<String, List<String>> allPagesParseResult);
+    List<String> collectDataFromPage(String url, List<ElementParser> elementParsers);
 }
